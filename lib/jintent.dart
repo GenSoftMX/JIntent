@@ -9,7 +9,8 @@ import 'package:get_it/get_it.dart';
 abstract class JState {}
 
 /// State notifier that handles states and emits updates.
-abstract class JController<T extends JState> extends StateNotifier<T> {
+abstract class JController<T extends JState> extends StateNotifier<T>
+    with JCommonsMixin {
   /// Constructor to initialize the state.
   JController(T initialState) : super(initialState);
 
@@ -53,7 +54,7 @@ mixin JCommonsMixin {
   /// This allows easy access to the context for navigation and UI-related operations.
   BuildContext get context {
     final intentToGetContext =
-        GetIt.I.get<JNavigationService>().key.currentState?.context;
+        GetIt.I.get<JNavigatorService>().key.currentState?.context;
 
     throwIf(
       intentToGetContext == null,
@@ -72,19 +73,33 @@ mixin JCommonsMixin {
   /// Returns the [ProviderContainer] using the [GetIt] service locator.
   ///
   /// This provides access to the ProviderContainer for managing state and providers.
-  ProviderContainer get jRef => GetIt.I.get<ProviderContainer>();
+  ProviderContainer get ref => GetIt.I.get<ProviderContainer>();
 
   /// Global definition of common navigation routes
-  JNavegator get goTo => GetIt.I.get<JNavegator>();
+  JNavegatorRoutesController get goTo =>
+      GetIt.I.get<JNavegatorRoutesController>();
 }
 
-abstract class JNavegator with JCommonsMixin {}
+abstract class JNavegatorRoutesController {}
 
-abstract class JProgressDialogManagerController {
-  Future<bool> show();
-  Future<bool> hide();
+abstract class JProgressDialogManagerController<T> {
+  Future<T> show({String? msg});
+  Future<T> hide();
 }
 
-class JNavigationService {
-  GlobalKey<NavigatorState> key = GlobalKey<NavigatorState>();
+class JNavigatorService {
+  // Private constructor to prevent instantiation from outside
+  JNavigatorService._privateConstructor();
+
+  // Instance of the singleton
+  static final JNavigatorService _instance =
+      JNavigatorService._privateConstructor();
+
+  // Getter to access the singleton instance
+  static JNavigatorService get instance => _instance;
+
+  // GlobalKey for the navigator state
+  final GlobalKey<NavigatorState> key = GlobalKey<NavigatorState>();
+
+  BuildContext get context => key.currentState!.context;
 }
