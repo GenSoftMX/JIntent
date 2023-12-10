@@ -91,7 +91,7 @@ class AuthWihFederalGooogleProviderIntent extends JIntent<AuthenticationState> {
 
 ## Documentation
 
-working on
+![My Image](assets/jintent.svg)
 
 ## Contributing
 
