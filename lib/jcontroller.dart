@@ -22,13 +22,8 @@ abstract class JController<T extends JState> extends StateNotifier<T>
 
   /// Handles an [JIntent] and updates the state accordingly.
   ///
-  /// This method is used to process intents and update the state based on the
-  ///
-  /// result of invoking the intent.
-  void intent(JIntent<T> intent) async {
-    // Invoke the intent and update the state
-    await intent.invoke(this).then((newState) {
-      setState(newState);
-    });
-  }
+  /// This method is used to process intents
+  void intent(JIntent<T> intent) =>
+      // Invoke the intent and update the state
+      intent.invoke(this);
 }

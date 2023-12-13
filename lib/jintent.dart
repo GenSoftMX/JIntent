@@ -12,5 +12,5 @@ abstract class JIntent<T extends JState> extends JCommonsMixin {
   /// This method is used to execute the intent, perform logic, and potentially
   ///
   /// modify the provided state.
-  Future<T> invoke(JController<T> controller);
+  invoke(JController<T> controller);
 }
