@@ -3,6 +3,8 @@
 
 `jintent` is a Flutter package that provides an architecture for managing state changes in your application using the concept of intents. This architecture promotes a structured and modular approach to handling specific actions or events, allowing for a clean separation of concerns.
 
+I created this library because I had difficulty organizing complex projects for a long time, I was not able to completely decouple the different events within the application, through this library we clearly manage the different events and states of the application.
+
 ## Features
 
 - **Intent Handling:** Introduce the concept of intents, encapsulating actions that can modify the state of your Flutter application.
