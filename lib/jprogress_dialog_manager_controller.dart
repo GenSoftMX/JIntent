@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:jintent/commons.dart';
 
 @immutable
-abstract class JProgressDialogManagerController<T> extends JCommonsMixin {
+abstract class JProgressDialogManagerController<T> {
   Future<T> show({String? msg});
   Future<T> hide();
 }

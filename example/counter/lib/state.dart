@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:jintent/jstate.dart';
 
 @immutable
-class State extends JState {
+class CounterState extends JState {
   final int counter;
 
-  State({required this.counter});
+  const CounterState({required this.counter});
 
   @override
-  State copyWith({int? newStateCounter}) =>
-      State(counter: newStateCounter ?? counter);
+  CounterState copyWith({int? newStateCounter}) =>
+      CounterState(counter: newStateCounter ?? counter);
+
+  @override
+  List<Object?> get props => [counter];
+
+  factory CounterState.initialState() => const CounterState(counter: 0);
 }

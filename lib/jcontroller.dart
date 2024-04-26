@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_state_notifier/flutter_state_notifier.dart';
 import 'package:jintent/commons.dart';
 import 'package:jintent/jstate.dart';
+import 'package:state_notifier/state_notifier.dart';
 
 /// State notifier that handles states and emits updates.
 abstract class JController<T extends JState> extends StateNotifier<T>
     with JCommonsMixin {
   /// Constructor to initialize the state.
-  JController(T initialState) : super(initialState);
+  JController(T initialState)
+      : super(
+          initialState,
+        );
 
   T get currentState => state;
 
   /// Function to set a new state[JState]
   void setState(T newState) {
     if (mounted) {
-      state = newState;
+      if (state != newState) {
+        state = newState;
+        debugPrint('state upsate');
+      } else {
+        debugPrint('new state is equal to new state');
+      }
     } else {
-      debugPrint('unmonted JController');
+      debugPrint('JController desmontado');
     }
   }
 

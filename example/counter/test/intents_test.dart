@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('Controler Unit Test', () {
 // Set initial State
-    final initialState = State(counter: 0);
+    const initialState = CounterState(counter: 0);
 
 // Create the controller
     final controller = Controller(initialState);
