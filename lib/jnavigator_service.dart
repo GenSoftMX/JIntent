@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:jintent/commons.dart';
 
-class JNavigatorService {
+class JNavigatorService with JCommonsMixin {
   // Private constructor to prevent instantiation from outside
-  JNavigatorService._privateConstructor();
+  JNavigatorService._privateConstructor() {
+    key = di<GlobalKey<NavigatorState>>();
+  }
 
   // Instance of the singleton
   static final JNavigatorService _instance =
@@ -12,7 +15,5 @@ class JNavigatorService {
   static JNavigatorService get instance => _instance;
 
   // GlobalKey for the navigator state
-  final GlobalKey<NavigatorState> key = GlobalKey<NavigatorState>();
-
-  BuildContext get context => key.currentState!.context;
+  late final GlobalKey<NavigatorState> key;
 }
