@@ -4,11 +4,12 @@ import 'package:counter/state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jintent/jstate.dart';
 
-final controllerProvider = StateNotifierProvider<Controller, State>((ref) {
-  return Controller(State(counter: 0));
+final controllerProvider =
+    StateNotifierProvider<Controller, CounterState>((ref) {
+  return Controller(CounterState.initialState());
 });
 
-class Controller extends JController<State> {
+class Controller extends JController<CounterState> {
   Controller(super.initialState);
 
   increment() {

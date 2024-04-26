@@ -24,14 +24,17 @@ class MockController extends JController<MockState> {
 class MockState extends JState {
   final int count;
 
-  MockState({required this.count});
+  const MockState({required this.count});
 
   @override
   MockState copyWith({int? newStateCount}) => MockState(
         count: newStateCount ?? count,
       );
 
-  factory MockState.initialState() => MockState(count: 0);
+  factory MockState.initialState() => const MockState(count: 0);
+
+  @override
+  List<Object?> get props => [count];
 }
 
 class MockIntent extends JIntent<MockState> {
