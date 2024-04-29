@@ -10,8 +10,6 @@ dependencies:
   equatable: ^2.0.5
   flutter:
     sdk: flutter
-  get_it: ">=6.0.0"
-  intl:
   state_notifier: ^1.0.0
 
 dev_dependencies:
