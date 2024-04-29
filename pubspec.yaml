@@ -1,7 +1,7 @@
 name: jintent
-description: "is a Flutter package that provides an architecture for managing state changes in your application using the concept of intents. This architecture promotes a structured and modular approach to handling specific actions or events, allowing for a clean separation of concerns."
-version: 0.0.5
-homepage: https://todoflutter.com/packages/jintent
+description: "https://github.com/GenSoftMX/JIntent"
+version: 1.0.0
+homepage: https://github.com/GenSoftMX/JIntent
 environment:
   sdk: ">=3.2.1 <4.0.0"
   flutter: ">=1.17.0"
@@ -18,7 +18,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-
-flutter: null
-flutter_intl:
-  enabled: true
