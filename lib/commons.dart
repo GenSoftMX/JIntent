@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:jintent/jprogress_dialog_manager_controller.dart';
 import 'package:jintent/jnavigator_service.dart';
 
 /// Mixin providing convenient access to common functionalities in Flutter.
 mixin class JCommonsMixin {
-  bool _loaded = false;
-  late JLocator di;
-
-  /// Set current [JLocator] using to find dependences;
+  /// Returns the current instance of [GetIt] used for dependency injection.
   ///
-  /// This allows easy access to dependences from some injector package like provider or GetIt
-  ///
-  setLocator({required JLocator locator}) {
-    if (!_loaded) {
-      di = locator;
-      _loaded = true;
-    }
-  }
+  /// This property provides access to the global instance of `GetIt`, allowing you
+  /// to retrieve registered dependencies throughout the application.
+  GetIt get di => GetIt.I;
 
   /// Returns the current [BuildContext] using the [NavigationService].
   ///
@@ -27,7 +20,7 @@ mixin class JCommonsMixin {
         di<JNavigatorService>().key.currentState?.context;
 
     if (intentToGetContext == null) {
-      throw Exception('context not found in [JCommonsMixin]');
+      throw Exception('context not found in [GetIt]');
     }
 
     return intentToGetContext;
@@ -39,5 +32,3 @@ mixin class JCommonsMixin {
   JProgressDialogManagerController get pd =>
       di<JProgressDialogManagerController>();
 }
-
-typedef JLocator = T Function<T>();
