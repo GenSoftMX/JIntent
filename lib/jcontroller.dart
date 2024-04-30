@@ -59,7 +59,7 @@ abstract class JController<T extends JState> extends StateNotifier<T>
   ///
   /// This method is useful for implementing a command-based pattern, where
   /// changes in the state are driven by specific intents or actions.
-  void intent(JIntent<T> intent) =>
+  Future<void> intent(JIntent<T> intent) =>
       // Invoke the intent and update the state
       intent.invoke(this);
 }

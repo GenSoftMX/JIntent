@@ -20,5 +20,5 @@ abstract class JIntent<T extends JState> with JCommonsMixin {
   /// to the state of the given [controller].
   ///
   /// - [controller]: The [JController] whose state may be modified by this intent.
-  void invoke(JController<T> controller);
+  Future<void> invoke(JController<T> controller);
 }
