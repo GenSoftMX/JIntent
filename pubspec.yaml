@@ -1,6 +1,6 @@
 name: jintent
 description: "https://github.com/GenSoftMX/JIntent"
-version: 1.0.0
+version: 1.0.0+1
 homepage: https://github.com/GenSoftMX/JIntent
 environment:
   sdk: ">=3.2.1 <4.0.0"
@@ -10,6 +10,7 @@ dependencies:
   equatable: ^2.0.5
   flutter:
     sdk: flutter
+  get_it: ^7.7.0
   state_notifier: ^1.0.0
 
 dev_dependencies:

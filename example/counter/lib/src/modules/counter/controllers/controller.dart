@@ -1,6 +1,6 @@
-import 'package:counter/decrement_intent.dart';
-import 'package:counter/increment_intent.dart';
-import 'package:counter/state.dart';
+import 'package:counter/src/modules/counter/intents/decrement_intent.dart';
+import 'package:counter/src/modules/counter/intents/increment_intent.dart';
+import 'package:counter/src/modules/counter/states/state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jintent/jstate.dart';
 
@@ -12,11 +12,11 @@ final controllerProvider =
 class Controller extends JController<CounterState> {
   Controller(super.initialState);
 
-  increment() {
+  void increment() {
     intent(IncrementIntent());
   }
 
-  decrement() {
+  void decrement() {
     intent(DecrementIntent());
   }
 }
