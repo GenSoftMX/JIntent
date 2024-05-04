@@ -3,7 +3,18 @@ import 'package:get_it/get_it.dart';
 import 'package:jintent/jprogress_dialog_manager_controller.dart';
 import 'package:jintent/jnavigator_service.dart';
 
-/// Mixin providing convenient access to common functionalities in Flutter.
+/// Commons module that contains shared utilities and functions.
+///
+/// This module provides a set of commonly used utilities, constants, and
+/// helper functions that can be shared across different parts of the application.
+///
+/// Typical contents of this module might include:
+/// - Utility functions for string manipulation.
+/// - Constants used throughout the application.
+/// - Common mixins or base classes for shared behavior.
+///
+/// By centralizing these common functionalities, the codebase can be
+/// more maintainable and consistent.
 mixin class JCommonsMixin {
   /// Returns the current instance of [GetIt] used for dependency injection.
   ///

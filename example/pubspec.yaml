@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   jintent:
-    path: ../..
+    path: ../
   get_it: ^7.7.0
 
   # The following adds the Cupertino Icons font to your application.

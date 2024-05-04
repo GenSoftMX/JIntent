@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:jintent/commons.dart';
 
-/// A service for managing navigation within the application, using a singleton pattern.
+/// Service that manages application navigation.
 ///
-/// The `JNavigatorService` class provides a single instance (singleton) to manage
-/// navigation within the application. It holds a `GlobalKey` for accessing and
-/// controlling the state of the application's navigator, allowing you to manage
-/// navigation tasks such as pushing and popping routes.
+/// The `JNavigatorService` class provides an abstraction for handling
+/// navigation within the application. It typically encapsulates logic
+/// for navigating between different screens or routes, allowing
+/// for a centralized approach to navigation.
 ///
-/// The singleton pattern ensures that there is only one instance of this service
-/// throughout the application's lifecycle, enabling centralized control of navigation.
+/// This service might include:
+/// - Methods to navigate to specific routes or screens.
+/// - Logic for handling navigation-related events.
+/// - Access to the current `BuildContext` for operations that require it.
+///
+/// By using a service for navigation, you can decouple navigation logic
+/// from individual widgets, making the application more maintainable.
 class JNavigatorService with JCommonsMixin {
   // Private constructor to prevent direct instantiation from outside
   JNavigatorService._privateConstructor() {
