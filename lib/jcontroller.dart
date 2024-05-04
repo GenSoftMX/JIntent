@@ -24,7 +24,9 @@ abstract class JController<T extends JState> extends StateNotifier<T>
   JController(T initialState)
       : super(
           initialState,
-        );
+        ) {
+    onInit();
+  }
 
   /// Returns the current state of type [T].
   ///
