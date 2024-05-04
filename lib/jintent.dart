@@ -3,15 +3,19 @@ library jintent;
 import 'package:jintent/commons.dart';
 import 'package:jintent/jstate.dart';
 
-/// Abstract class representing an intent that can modify the state of the application.
+/// Represents an action or event that can modify application state.
 ///
-/// A [JIntent] encapsulates an action or command that can affect the state of
-/// the application when invoked. It typically contains logic to be executed,
-/// which may lead to changes in the state managed by a [JController].
+/// The `JIntent` class is an abstraction that encapsulates a specific
+/// action or event that may result in a change to the application's state.
+/// This concept helps to structure the application by clearly defining
+/// the different actions and how they affect the state.
 ///
-/// This class serves as a blueprint for defining various intents that carry out
-/// specific operations. Subclasses should implement the [invoke] method to
-/// execute the intended logic.
+/// When implemented, an `JIntent` typically contains:
+/// - A method to invoke the action (`invoke()`).
+/// - Any parameters or dependencies required to perform the action.
+///
+/// Intents are used in conjunction with controllers to manage
+/// the logic and state changes within the application.
 abstract class JIntent<T extends JState> with JCommonsMixin {
   /// Invokes the intent, potentially modifying the state managed by the [controller].
   ///

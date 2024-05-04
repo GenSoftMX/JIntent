@@ -358,7 +358,7 @@ packages:
   jintent:
     dependency: "direct main"
     description:
-      path: "../.."
+      path: ".."
       relative: true
     source: path
     version: "1.0.0+1"
