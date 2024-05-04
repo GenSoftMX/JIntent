@@ -1,6 +1,6 @@
 name: jintent
 description: "https://github.com/GenSoftMX/JIntent"
-version: 1.0.0+2
+version: 1.0.0+3
 homepage: https://github.com/GenSoftMX/JIntent
 environment:
   sdk: ">=3.2.1 <4.0.0"
