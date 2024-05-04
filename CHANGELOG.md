@@ -54,3 +54,6 @@ Common cleanup tasks include:
   
 **Important:** Failing to clean up resources can lead to memory leaks
 and other unpredictable behavior, so always ensure proper disposal.
+
+## Version 1.0.0+3 call OnInit in contracutor(to get expected behavior with OnInit Event) (2024/05/03)
+- call OnInit JController contructor as default.
