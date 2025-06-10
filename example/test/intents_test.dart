@@ -1,6 +1,5 @@
 import 'package:counter/src/presentation/counter/controllers/controller.dart';
 import 'package:counter/src/presentation/counter/intents/decrement_intent.dart';
-import 'package:counter/src/presentation/counter/intents/increment_intent.dart';
 import 'package:counter/src/presentation/counter/states/state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';

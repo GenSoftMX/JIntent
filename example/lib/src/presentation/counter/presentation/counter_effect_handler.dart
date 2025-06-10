@@ -15,7 +15,7 @@ class CounterEffectHandler extends JSideEffectHandler<CounterState> {
   Future<void> _onDecrementSuccessfull(ShowDecrementSuccessfull effect,
       JController<CounterState> controller) async {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(effect.message)),
+      SnackBar(content: Text(effect.message),duration: const Duration(seconds: 2),),
     );
   }
 
@@ -37,7 +37,7 @@ class CounterEffectHandler extends JSideEffectHandler<CounterState> {
             onPressed: () {
               Navigator.of(context).pop(true);
             },
-            child: const Text('Sí'),
+            child: const Text('Yes'),
           ),
         ],
       ),
@@ -57,7 +57,7 @@ class ConfirmIncrementffect extends JEffect<bool> {
   final String title;
   final String content;
   ConfirmIncrementffect({
-    this.title = 'Confirmar incremento',
-    this.content = '¿Quieres sumar +1?',
+this.title = 'Confirm Increment',
+this.content = 'Do you want to add +1?',
   });
 }

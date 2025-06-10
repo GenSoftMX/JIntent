@@ -12,7 +12,7 @@ class DecrementIntent extends JIntent<CounterState> {
 
     final newState = state.copyWith(newStateCounter: counter - 1);
 
-    controller.emitSideEffect(ShowDecrementSuccessfull(message: "Se resto 1 a $counter"));
+    controller.emitSideEffect(ShowDecrementSuccessfull(message: "1 was subtracted from $counter"));
 
     controller.setState(newState);
   }
