@@ -21,10 +21,10 @@ To get started with `jintent`, follow these steps:
 
    ```yaml
    dependencies:
-     jintent: ^1.0.0
+     jintent: ^1.0.1
    ```
 
-   Replace `^1.0.0` with the latest version.
+   Replace `^1.0.1` with the latest version.
 
 2. Import the package in your Dart code:
 
@@ -40,56 +40,184 @@ To get started with `jintent`, follow these steps:
 
 ## Example
 
-Here's a simple example demonstrating how to use `jintent`:
+Here's a simple example demonstrating how to use:
 
 
-* Definition and authentication with federal google provider intent.
+Full example:
+
+* `AuthenticationState`
+* `AuthenticationController`
+* `AuthenticationIntent`
+* Y un uso típico en UI con `emitSideEffect`, `setState`, y `intent`.
+
+---
+
+### 📦 1. `AuthenticationState`
+
 ```dart
+import 'package:jintent/jstate.dart';
 
-class AuthWihFederalGooogleProviderIntent extends JIntent<AuthenticationState> {
-  final AuthType authType;
+class AuthenticationState extends JState {
+  final String email;
+  final String password;
+  final bool isLoading;
 
-  AuthWihFederalGooogleProviderIntent({required this.authType});
-  @override
-  Future<AuthenticationState> invoke(AuthenticationState state) async {
-    pd.show();
-    try {
-      await signInWithGoogle();
+  AuthenticationState({
+    this.email = '',
+    this.password = ''
+  });
 
-      goTo.home();
-      
-      await Future.delayed($styles.times.fast);
-      
-      pd.hide();
-      
-      return state;
-    } catch (e) {
-      pd.hide();
-    }
-
-    return state;
+  AuthenticationState copyWith({
+    String? email,
+    String? password,
+    bool? isLoading,
+  }) {
+    return AuthenticationState(
+      email: email ?? this.email,
+      password: password ?? this.password,
+      isLoading: isLoading ?? this.isLoading,
+    );
   }
 
-  Future<UserCredential> signInWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  @override
+  List<Object?> get props => [email, password, isLoading];
+}
+```
 
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
+---
 
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
+### ⚙️ 2. `AuthenticationController`
 
-    // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+```dart
+import 'package:jintent/jcontroller.dart';
+import 'authentication_state.dart';
+import 'authentication_intent.dart';
+
+class AuthenticationController extends JController<AuthenticationState> {
+  AuthenticationController() : super(AuthenticationState());
+
+  @override
+  void onInit() {
+    super.onInit();
+    // You could load saved credentials or something else here.
   }
 }
-
 ```
+
+---
+
+### 🚀 3. `AuthenticationIntent`
+
+```dart
+import 'package:jintent/jintent.dart';
+import 'authentication_state.dart';
+import 'authentication_controller.dart';
+import 'package:jintent/jeffect.dart';
+
+class SubmitLoginIntent extends JIntent<AuthenticationState> {
+  final String email;
+  final String password;
+
+  SubmitLoginIntent({
+    required this.email,
+    required this.password,
+  });
+
+  @override
+  Future<void> invoke(JController<AuthenticationState> controller) async {
+    final c = controller as AuthenticationController;
+
+    // Set loading state
+    c.setState(c.currentState.copyWith(isLoading: true));
+
+    await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+
+    if (email == 'admin@test.com' && password == '123456') {
+      // Emit a navigation or success effect
+      c.emitSideEffect(SuccessLoginEffect());
+    } else {
+      c.emitSideEffect(
+        ShowErrorDialogEffect(message: 'Invalid credentials'),
+      );
+    }
+
+    // Remove loading
+    c.setState(c.currentState.copyWith(isLoading: false));
+  }
+}
+```
+
+---
+
+### 💥 4. `SideEffects`
+
+```dart
+class ShowErrorDialogEffect extends JEffect<void> {
+  final String message;
+  ShowErrorDialogEffect({required this.message});
+}
+
+class SuccessLoginEffect extends JEffect<void> {}
+```
+
+---
+
+### 🧩 5. UI Handler Example (Flutter)
+
+```dart
+void setupEffectHandler(
+  AuthenticationController controller,
+  BuildContext context,
+) {
+  final handler = JSideEffectHandler<AuthenticationState>(controller, context);
+
+  handler.register<ShowErrorDialogEffect>((effect, _) async {
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Login Failed'),
+        content: Text(effect.message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              effect.complete(null);
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  });
+
+  handler.register<SuccessLoginEffect>((effect, _) async {
+    Navigator.of(context).pushReplacementNamed('/home');
+    effect.complete(null);
+  });
+
+  controller.sideEffects.listen((e) => handler.handle(e, controller));
+}
+```
+
+---
+
+### 🧪 6. Ejemplo en UI (`onPressed` o similar)
+
+```dart
+final controller = AuthenticationController();
+
+// Somewhere in your button:
+onPressed: () {
+  controller.intent(
+    SubmitLoginIntent(email: 'admin@test.com', password: '123456'),
+  );
+}
+```
+
+---
+
+¿Te gustaría que también te genere esto como una mini app de ejemplo o que lo exporte a archivos organizados para copiar y pegar?
+
 
 ## Documentation
 

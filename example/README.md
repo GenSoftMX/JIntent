@@ -15,11 +15,10 @@ The MVI architecture separates an application into three components: Model, View
 
 ## Project Structure
 
-- `lib/state.dart`: Defines the `CounterState` class, representing the state of the counter.
+- `lib/src/presentation/counter/state/state.dart`: Defines the `CounterState` class, representing the state of the counter.
 
-- `lib/increment_intent.dart`: Defines the `IncrementIntent` class, representing user actions to increment.
-- `lib/decrement_intent.dart`: Defines the `IncrementIntent` class, representing user actions to decrement.
-- `lib/controller.dart`: Implements the `Controller` class, a `StateNotifier` that handles state changes based on user actions.
+- `lib/src/presentation/counter/intents/increment_intent.dart`: Defines the `IncrementIntent` class, representing user actions to increment.
+- `lib/src/presentation/counter/controller/controller.dart`: Implements the `Controller` class, a `StateNotifier` that handles state changes based on user actions.
 
 - `lib/main.dart`: The entry point of the application. It sets up the `ProviderScope` and creates the `CounterScreen` widget.
 

@@ -1,4 +1,5 @@
-import 'package:counter/src/modules/splash/controllers/splash_controller.dart';
+import 'package:counter/src/presentation/counter/presentation/counter_view.dart';
+import 'package:counter/src/presentation/splash/controllers/splash_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,8 +13,19 @@ class SplashView extends ConsumerStatefulWidget {
 class _SplashViewState extends ConsumerState<SplashView> {
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(
-        (timeStamp) => ref.read(splashControllerProvider.notifier).init());
+    final controller = ref.read(splashControllerProvider.notifier);
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) => controller.init());
+
+    controller.sideEffects.listen((effect) {
+      if (mounted) {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const CounterView(
+            title: 'Flutter Demo Home Page',
+          ),
+        ));
+      }
+    });
 
     super.initState();
   }

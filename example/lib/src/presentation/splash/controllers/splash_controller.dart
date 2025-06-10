@@ -1,7 +1,6 @@
-import 'package:counter/src/modules/counter/presentation/counter_view.dart';
-import 'package:counter/src/modules/splash/states/splash_state.dart';
-import 'package:flutter/material.dart';
+import 'package:counter/src/presentation/splash/states/splash_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jintent/jeffect.dart';
 import 'package:jintent/jstate.dart';
 
 final splashControllerProvider =
@@ -14,10 +13,10 @@ class SplashController extends JController<SplashState> {
 
   init() async {
     Future.delayed(const Duration(seconds: 2))
-        .then((value) => Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const CounterView(
-                title: 'Flutter Demo Home Page',
-              ),
-            )));
+        .then((value) => emitSideEffect(NavigateEffect()));
   }
+}
+
+class NavigateEffect extends JEffect {
+  NavigateEffect();
 }
