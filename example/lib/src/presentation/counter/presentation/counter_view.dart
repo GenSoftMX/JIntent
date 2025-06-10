@@ -1,18 +1,38 @@
-import 'package:counter/src/modules/counter/controllers/controller.dart';
+import 'package:counter/src/presentation/counter/controllers/controller.dart';
+import 'package:counter/src/presentation/counter/presentation/counter_effect_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CounterView extends ConsumerWidget {
+class CounterView extends ConsumerStatefulWidget {
   final String title;
 
   const CounterView({super.key, required this.title});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final counter =
-        ref.watch(controllerProvider.select((value) => value.counter));
+  ConsumerState<ConsumerStatefulWidget> createState() => _CounterViewState();
+}
 
-    final controller = ref.read(controllerProvider.notifier);
+class _CounterViewState extends ConsumerState<CounterView> {
+  @override
+  void initState() {
+    final controller = ref.read(couterControllerProvider.notifier);
+
+    controller.sideEffects.listen((effect) {
+      if (mounted) {
+        CounterEffectHandler(controller, context).handle(effect, controller);
+      }
+    });
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final counter = ref.watch(
+      couterControllerProvider.select((value) => value.counter),
+    );
+
+    final controller = ref.read(couterControllerProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -22,7 +42,7 @@ class CounterView extends ConsumerWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(title),
+        title: Text(widget.title),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -43,13 +63,8 @@ class CounterView extends ConsumerWidget {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            const Text('You have pushed the button this many times:'),
+            Text('$counter', style: Theme.of(context).textTheme.headlineMedium),
           ],
         ),
       ),
@@ -65,9 +80,7 @@ class CounterView extends ConsumerWidget {
             tooltip: 'Increment',
             icon: const Icon(Icons.exposure_plus_1_outlined),
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           FloatingActionButton.extended(
             label: const Text('Decrement'),
             heroTag: 'Decrement',
