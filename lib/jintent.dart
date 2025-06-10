@@ -1,6 +1,5 @@
 library jintent;
 
-import 'package:jintent/commons.dart';
 import 'package:jintent/jstate.dart';
 
 /// Represents an action or event that can modify application state.
@@ -16,7 +15,7 @@ import 'package:jintent/jstate.dart';
 ///
 /// Intents are used in conjunction with controllers to manage
 /// the logic and state changes within the application.
-abstract class JIntent<T extends JState> with JCommonsMixin {
+abstract class JIntent<T extends JState> {
   /// Invokes the intent, potentially modifying the state managed by the [controller].
   ///
   /// This method is called to execute the logic defined in the intent.

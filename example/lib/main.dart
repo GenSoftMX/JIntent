@@ -1,5 +1,5 @@
 import 'package:counter/di/di.dart';
-import 'package:counter/src/modules/splash/presentation/splash_view.dart';
+import 'package:counter/src/presentation/splash/presentation/splash_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,14 +34,17 @@ void main() async {
 // Initialization of GetIt and inject dependences
   await Di().init();
 
-  runApp(const ProviderScope(
-    child: MyApp(),
-  ));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
