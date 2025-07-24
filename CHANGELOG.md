@@ -1,3 +1,17 @@
+## 2.0.0 - Side Effects, UI Decoupling, Dependency Cleanup (2024/06/10)
+✨ **New Features: Side Effects**
+- **Side Effect Stream:** Introduced a `Stream<JEffect>` inside `JController` to handle transient UI actions like navigation, dialogs, and snackbars. These are events that don't modify the application state but require a one-time reaction from the UI.
+- **emitSideEffect():** You can now trigger a side effect from the controller using `emitSideEffect(effect)` or `emitAndWaitSideEffect(effect)` to optionally wait for a result.
+- **JEffect:** A new abstract class to represent side effects. Can optionally return a result using a `Completer<T>`, useful for awaiting user input (e.g. confirmation dialogs).
+- **JSideEffectHandler:** A centralized handler in the UI to react to emitted side effects by type, keeping business logic and UI logic cleanly separated.
+
+🔄 **Architecture Improvements**
+- **UI Decoupling:** The UI no longer directly interacts with the controller for triggering logic or responses. Instead, the UI listens to sideEffects and emits `JIntent` instances indirectly, promoting a fully decoupled flow.
+- **Intent-Centric Workflow:** The communication between UI and logic is now entirely intent-driven. The controller receives intents and updates state or emits side effects, maintaining separation of concerns.
+
+🧹 **Dependency Cleanup**
+- **Removed get_it Dependency:** The package is no longer used internally. All dependency injection is now left to the user's implementation or application layer, giving you full control over your architecture and reducing tight coupling.
+
 ## 1.0.0 - Initial Release(2024/04/28)
 
 Key Features

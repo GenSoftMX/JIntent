@@ -1,4 +1,5 @@
-import 'package:jintent/jstate.dart';
+
+import 'package:jintent/jintent.dart';
 
 class SplashState extends JState {
   const SplashState();

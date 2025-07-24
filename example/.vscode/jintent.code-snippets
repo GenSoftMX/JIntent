@@ -1,0 +1,88 @@
+{
+	"JIntent Basic Class": {
+		"prefix": "jintent",
+		"body": [
+			"import 'package:jintent/jintent.dart';",
+			"",
+			"class ${1:MyIntent} extends JIntent<${2:MyState}> with JIntentHelpers {",
+			"  @override",
+			"  Future<void> onInvoke() async {",
+			"    // Your logic here",
+			"    update((state) => state.copyWith());",
+			"  }",
+			"}"
+		],
+		"description": "Creates a basic JIntent class without metadata or dependencies"
+	},
+	"JIntent Riverpod Provider": {
+		"prefix": "jcontroller_provider_riverpod",
+		"body": [
+			"final ${1:myControllerProvider} = StateNotifierProvider<${2:MyController}, ${3:MyState}>((ref) {",
+			"  return ${2:MyController}(${3:MyState}.initialState());",
+			"});"
+		],
+		"description": "Creates a StateNotifierProvider using JIntent architecture with JController"
+	},
+	"JController Basic Class": {
+		"prefix": "jcontroller",
+		"body": [
+			"import 'package:jintent/jintent.dart';",
+			"",
+			"class ${1:MyController} extends JController<${2:MyState}> {",
+			"  ${1}() : super(${2}.initialState());",
+			"",
+			"  // Example of dispatching an intent",
+			"  Future<void> doSomethingIntent() async {",
+			"    await intent(${3:SomeIntent}());",
+			"  }",
+			"",
+			"  @override",
+			"  void onInit() {",
+			"    super.onInit();",
+			"    // Initial logic if needed",
+			"  }",
+			"}"
+		],
+		"description": "Creates a JController class with state and intent support"
+	},
+	"JState Basic Class": {
+		"prefix": "jstate",
+		"body": [
+			"import 'package:jintent/jintent.dart';",
+			"",
+			"class ${1:MyState} extends JState {",
+			"  final ${2:int} ${3:example};",
+			"",
+			"  const ${1}({",
+			"    required this.${3},",
+			"  });",
+			"",
+			"  factory ${1}.initialState() => const ${1}(${3}: 0);",
+			"",
+			"  @override",
+			"  ${1} copyWith({",
+			"    ${2}? ${3},",
+			"  }) {",
+			"    return ${1}(",
+			"      ${3}: ${3} ?? this.${3},",
+			"    );",
+			"  }",
+			"",
+			"  @override",
+			"  List<Object?> get props => [${3}];",
+			"}"
+		],
+		"description": "Creates a basic JState implementation with copyWith and initialState"
+	},
+	"JEffect Class": {
+		"prefix": "jeffect",
+		"body": [
+			"class ${1:ShowRejectOperation} extends JEffect {",
+			"  final String ${2:message};",
+			"",
+			"  ${1}({required this.${2}});",
+			"}"
+		],
+		"description": "Creates a simple class that extends JEffect"
+	}
+}

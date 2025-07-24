@@ -1,10 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-export 'jcontroller.dart';
-export 'jintent.dart';
-export 'jnavigator_service.dart';
-
 /// An immutable base class representing the state in an application.
 ///
 /// The `JState` class is designed to be used as a base class for defining state
