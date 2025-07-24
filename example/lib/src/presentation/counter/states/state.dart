@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jintent/jstate.dart';
+import 'package:jintent/jintent.dart';
 
 @immutable
 class CounterState extends JState {

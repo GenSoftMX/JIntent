@@ -1,19 +1,40 @@
+import 'package:counter/src/domain/use_cases/decrement_use_case.dart';
+import 'package:counter/src/domain/use_cases/save_current_value_use_case.dart';
 import 'package:counter/src/presentation/counter/presentation/counter_effect_handler.dart';
 import 'package:counter/src/presentation/counter/states/state.dart';
-import 'package:jintent/jcontroller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:jintent/jintent.dart';
 
-class DecrementIntent extends JIntent<CounterState> {
+class DecrementIntent extends JIntent<CounterState> with JIntentHelpers {
+  final DecrementUseCase _decrementIntent;
+  final SaveCurrentValueUseCase _saveCurrentValueUseCase;
+
+  DecrementIntent({
+    required DecrementUseCase decrementUseCase,
+    required SaveCurrentValueUseCase saveCurrentValueUseCase,
+  }) : _decrementIntent = decrementUseCase,
+       _saveCurrentValueUseCase = saveCurrentValueUseCase;
+       
   @override
-  invoke(JController<CounterState> controller) async {
-    final state = controller.currentState;
+  Future<void> onInvoke() async {
+    final decrementResult = _decrementIntent.run(state.counter);
 
-    final counter = state.counter;
+    decrementResult.fold(
+      (failure) => handleFailure(failure),
+      (data) => handleSuccess(data),
+    );
+  }
 
-    final newState = state.copyWith(newStateCounter: counter - 1);
+  @protected
+  void handleFailure(Exception e) {
+    controller.emitSideEffect(ShowRejectOperation(message: e.toString()));
+  }
 
-    controller.emitSideEffect(ShowDecrementSuccessfull(message: "1 was subtracted from $counter"));
+  @protected
+  void handleSuccess(int value) async {
+    _saveCurrentValueUseCase.run(value);
 
-    controller.setState(newState);
+    update((state) => state.copyWith(newStateCounter: value));
   }
 }
+

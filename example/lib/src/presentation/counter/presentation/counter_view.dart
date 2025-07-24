@@ -1,29 +1,32 @@
 import 'package:counter/src/presentation/counter/controllers/controller.dart';
 import 'package:counter/src/presentation/counter/presentation/counter_effect_handler.dart';
+import 'package:counter/src/presentation/counter/states/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jintent/jintent.dart';
 
 class CounterView extends ConsumerStatefulWidget {
-  final String title;
 
-  const CounterView({super.key, required this.title});
+  const CounterView({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _CounterViewState();
 }
 
 class _CounterViewState extends ConsumerState<CounterView> {
+  final throttler = JThrottler(const Duration(milliseconds: 200));
+
+
+  late final CounterController _counterController;
+
+ JSideEffectHandler<CounterState> get _sideEffectHandler =>
+      CounterEffectHandler(_counterController);
+
   @override
   void initState() {
-    final controller = ref.read(couterControllerProvider.notifier);
-
-    controller.sideEffects.listen((effect) {
-      if (mounted) {
-        CounterEffectHandler(controller, context).handle(effect, controller);
-      }
-    });
-
     super.initState();
+
+    _counterController = ref.read(couterControllerProvider.notifier);
   }
 
   @override
@@ -32,63 +35,41 @@ class _CounterViewState extends ConsumerState<CounterView> {
       couterControllerProvider.select((value) => value.counter),
     );
 
-    final controller = ref.read(couterControllerProvider.notifier);
-
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text('$counter', style: Theme.of(context).textTheme.headlineMedium),
+    return JEffectListener(
+      controller: _counterController,
+      handler: _sideEffectHandler,
+      child: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text('You have pushed the button this many times:'),
+              Text('$counter', style: Theme.of(context).textTheme.headlineMedium),
+            ],
+          ),
+        ),
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton.extended(
+              label: const Text('Increment'),
+              heroTag: 'Increment',
+              onPressed: () => throttler.call(_counterController.increment),
+              tooltip: 'Increment',
+              icon: const Icon(Icons.exposure_plus_1_outlined),
+            ),
+            const SizedBox(height: 10),
+            FloatingActionButton.extended(
+              label: const Text('Decrement'),
+              heroTag: 'Decrement',
+              onPressed: () => throttler.call(_counterController.decrement),
+              tooltip: 'Decrement',
+              icon: const Icon(Icons.exposure_minus_1_sharp),
+            ),
           ],
         ),
-      ),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton.extended(
-            label: const Text('Increment'),
-            heroTag: 'Increment',
-            onPressed: () => controller.increment(),
-            tooltip: 'Increment',
-            icon: const Icon(Icons.exposure_plus_1_outlined),
-          ),
-          const SizedBox(height: 10),
-          FloatingActionButton.extended(
-            label: const Text('Decrement'),
-            heroTag: 'Decrement',
-            onPressed: () => controller.decrement(),
-            tooltip: 'Decrement',
-            icon: const Icon(Icons.exposure_minus_1_sharp),
-          ),
-        ],
       ),
     );
   }

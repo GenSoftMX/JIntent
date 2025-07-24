@@ -1,22 +1,31 @@
+import 'package:counter/di/di.dart';
 import 'package:counter/src/presentation/counter/intents/decrement_intent.dart';
+import 'package:counter/src/presentation/counter/intents/get_current_counter_value_intent.dart';
 import 'package:counter/src/presentation/counter/intents/increment_intent.dart';
 import 'package:counter/src/presentation/counter/states/state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jintent/jstate.dart';
+import 'package:jintent/jintent.dart';
 
 final couterControllerProvider =
-    StateNotifierProvider<Controller, CounterState>((ref) {
-  return Controller(CounterState.initialState());
-});
+    StateNotifierProvider<CounterController, CounterState>((ref) {
+      return CounterController(CounterState.initialState());
+    });
 
-class Controller extends JController<CounterState> {
-  Controller(super.initialState);
+class CounterController extends JController<CounterState> {
+  final _getCurrentCounterValueIntent = Di.sl<GetCurrentCounterValueIntent>();
+  final _incrementIntent = Di.sl<IncrementIntent>();
+  final _decrementIntent = Di.sl<DecrementIntent>();
 
-  void increment() async {
-    intent(IncrementIntent());
+  CounterController(super.initialState);
+
+  void loadCounter() {
+    intent(_getCurrentCounterValueIntent);
   }
 
-  void decrement() {
-    intent(DecrementIntent());
-  }
+  void increment() => intent(_incrementIntent);
+
+  void decrement() => intent(_decrementIntent);
+  
+  @override
+  void onInit() { }
 }

@@ -1,20 +1,44 @@
+import 'package:flutter/material.dart';
+import 'package:jintent/jintent.dart';
+
+import 'package:counter/src/domain/use_cases/increment_use_case.dart';
+import 'package:counter/src/domain/use_cases/save_current_value_use_case.dart';
 import 'package:counter/src/presentation/counter/presentation/counter_effect_handler.dart';
 import 'package:counter/src/presentation/counter/states/state.dart';
-import 'package:jintent/jstate.dart';
 
-class IncrementIntent extends JIntent<CounterState> {
+class IncrementIntent extends JIntent<CounterState> with JIntentHelpers {
+  final IncrementUseCase _incrementUseCase;
+  final SaveCurrentValueUseCase _saveCurrentValueUseCase;
+
+  IncrementIntent({
+    required IncrementUseCase incrementUseCase,
+    required SaveCurrentValueUseCase saveCurrentValueUseCase,
+  }) : _incrementUseCase = incrementUseCase,
+       _saveCurrentValueUseCase = saveCurrentValueUseCase;
+
   @override
-  invoke(JController<CounterState> controller) async {
+  Future<void> onInvoke() async {
     final state = controller.currentState;
-    final counter = state.counter;
 
-    final confirmed =
-        await controller.emitAndWaitSideEffect<bool>(ConfirmIncrementffect());
-        
-    if (confirmed) {
-      var newState = state.copyWith(newStateCounter: counter + 1);
+    final incrementResult = _incrementUseCase(state.counter);
 
-      controller.setState(newState);
-    }
+    incrementResult.fold(
+      (failure) => handleFailure(failure),
+      (data) => handleSuccess(data),
+    );
+  }
+
+  @protected
+  void handleFailure(Exception e) async {
+    await emitAndWaitSideEffect<bool>(
+      ShowRejectOperation(message: e.toString()),
+    );
+  }
+
+  @protected
+  void handleSuccess(int value) {
+    _saveCurrentValueUseCase.run(value);
+
+    update((state) => state.copyWith(newStateCounter: value));
   }
 }

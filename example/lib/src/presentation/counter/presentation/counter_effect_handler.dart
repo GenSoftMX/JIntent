@@ -1,63 +1,35 @@
+import 'dart:async';
+
 import 'package:counter/src/presentation/counter/states/state.dart';
 import 'package:flutter/material.dart';
-import 'package:jintent/jcontroller.dart';
-import 'package:jintent/jeffect.dart';
-import 'package:jintent/jstate.dart';
+import 'package:jintent/jintent.dart';
 
 class CounterEffectHandler extends JSideEffectHandler<CounterState> {
-  CounterEffectHandler(
-      JController<CounterState> controller, BuildContext context)
-      : super(controller, context) {
-    register<ShowDecrementSuccessfull>(_onDecrementSuccessfull);
-    register<ConfirmIncrementffect>(_handleConfirmAge);
+  CounterEffectHandler(super.controller) {
+    register<ShowRejectOperation>(_onDecrementSuccessfull);
   }
 
-  Future<void> _onDecrementSuccessfull(ShowDecrementSuccessfull effect,
-      JController<CounterState> controller) async {
+  Future<void> _onDecrementSuccessfull(
+    ShowRejectOperation effect,
+    JController<CounterState> controller,
+    BuildContext context
+  ) async {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(effect.message),duration: const Duration(seconds: 2),),
-    );
-  }
+      SnackBar(
+        content: Text(
+          effect.message,
+          style: const TextStyle(color: Colors.white),
+        ),
 
-  Future<void> _handleConfirmAge(ConfirmIncrementffect effect,
-      JController<CounterState> controller) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(effect.title),
-        content: Text(effect.content),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            child: const Text('No'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-            child: const Text('Yes'),
-          ),
-        ],
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.red,
       ),
     );
-
-    return effect.complete(result ?? false);
   }
 }
 
-class ShowDecrementSuccessfull extends JEffect {
+class ShowRejectOperation extends JEffect<bool> {
   final String message;
 
-  ShowDecrementSuccessfull({required this.message});
-}
-
-class ConfirmIncrementffect extends JEffect<bool> {
-  final String title;
-  final String content;
-  ConfirmIncrementffect({
-this.title = 'Confirm Increment',
-this.content = 'Do you want to add +1?',
-  });
+  ShowRejectOperation({required this.message});
 }
