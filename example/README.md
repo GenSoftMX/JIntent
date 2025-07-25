@@ -1,7 +1,8 @@
+# Counter App with MVI Architecture (Powered by JIntent)
 
-# Counter App with MVI Architecture
+A simple Flutter counter app demonstrating the MVI (Model-View-Intent) architecture, now powered by [JIntent](https://github.com/GenSoftMX/JIntent) to streamline intent handling, state management, and side effects.
 
-A simple Flutter counter app demonstrating the MVI (Model-View-Intent) architecture using Riverpod and the provider package.
+---
 
 ## Overview
 
@@ -13,24 +14,45 @@ The MVI architecture separates an application into three components: Model, View
 
 - **Intent:** Represents user actions that trigger state changes. The `CounterIntent` class defines different user actions, such as incrementing and decrementing the count.
 
+With **JIntent**, you also benefit from:
+- **Side effect management:** Clean handling of navigation, dialogs, and other one-off UI actions via the side effect stream.
+- **Decoupled architecture:** UI interacts with the controller through intents, and responds to state and side effects, promoting a maintainable and scalable codebase.
+
+---
+
 ## Project Structure
 
 - `lib/src/presentation/counter/state/state.dart`: Defines the `CounterState` class, representing the state of the counter.
-
 - `lib/src/presentation/counter/intents/increment_intent.dart`: Defines the `IncrementIntent` class, representing user actions to increment.
-- `lib/src/presentation/counter/controller/controller.dart`: Implements the `Controller` class, a `StateNotifier` that handles state changes based on user actions.
-
+- `lib/src/presentation/counter/controller/controller.dart`: Implements the `Controller` class, extending `JController` to handle state changes and side effects based on user actions and intents.
 - `lib/main.dart`: The entry point of the application. It sets up the `ProviderScope` and creates the `CounterScreen` widget.
 
+---
 
 ## Implementation Diagram
 
-![My Image](assets/count-diagram.png)
+![Counter MVI Diagram](assets/count-diagram.png)
+
+---
+
 ## Dependencies
 
 - [flutter](https://flutter.dev/)
 - [riverpod](https://pub.dev/packages/riverpod)
 - [provider](https://pub.dev/packages/provider)
+- [JIntent](https://pub.dev/packages/jintent)
+
+---
+
+## What's New with JIntent v2.0.0?
+
+- **Side Effects System:** Use a side effect stream to handle navigation, dialogs, snackbars, and more in a clear, centralized way.
+- **UI/Controller Decoupling:** The UI listens to state and side effects; logic is triggered via intents, not by direct controller calls.
+- **Dependency Injection Agnostic:** No internal dependency injection—use your favorite approach or manage dependencies manually.
+
+For more details, see the [full changelog](../CHANGELOG.md).
+
+---
 
 ## How to Run
 
@@ -54,16 +76,22 @@ The MVI architecture separates an application into three components: Model, View
    flutter run
    ```
 
-4. Run test:
+5. Run tests:
 
    ```bash
    flutter test
    ```
+
+---
+
 ## Contributing
 
 Contributions are welcome! Feel free to open issues or pull requests for any improvements or features you'd like to add.
 
+---
+
 ## License
+
 MIT License
 
 Copyright (c) 2020 Remi Rousselet
