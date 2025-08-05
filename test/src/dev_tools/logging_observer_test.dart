@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jintent/jintent.dart';
@@ -23,7 +22,6 @@ class FakeEffect extends JEffect<void> {}
 void main() {
   group('enableLoggingObserver', () {
     test('registers logging callbacks when in debug mode', () {
-
       enableLoggingObserver();
 
       expect(JObserver.onIntentDispatched, isNotNull);
@@ -38,7 +36,7 @@ void main() {
       final prevState = FakeState();
       final nextState = FakeState();
       final effect = FakeEffect();
-      
+
       final prints = <String>[];
 
       debugPrint = (String? message, {int? wrapWidth}) {
@@ -52,12 +50,13 @@ void main() {
       JObserver.onEffectEmitted?.call(effect);
 
       expect(
-          prints,
-          containsAll([
-            '[Observer] Intent dispatched: FakeIntent',
-            '[Observer] State changed: FakeState → FakeState (via FakeIntent)',
-            '[Observer] Effect emitted: FakeEffect',
-          ]));
+        prints,
+        containsAll([
+          '[Observer] Intent dispatched: FakeIntent',
+          '[Observer] State changed: FakeState → FakeState (via FakeIntent)',
+          '[Observer] Effect emitted: FakeEffect',
+        ]),
+      );
 
       // Restaurar debugPrint si quieres:
       debugPrint = debugPrintSynchronously;

@@ -28,7 +28,7 @@ class GetCurrentCounterValueIntent extends JIntent<CounterState>
   void handleFailure(Exception e) {
     emitSideEffect(ShowRejectOperation(message: e.toString()));
   }
-  
+
   @protected
   void handleSuccess(int value) async {
     update((state) => state.copyWith(newStateCounter: value));

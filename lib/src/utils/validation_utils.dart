@@ -53,7 +53,12 @@ class JValidationUtils {
   }
 
   /// Parses a string to int and clamps it between [min] and [max]. Returns [defaultValue] if parsing fails.
-  static int parseIntInRange(String? value, {int min = 0, int max = 100, int defaultValue = 0}) {
+  static int parseIntInRange(
+    String? value, {
+    int min = 0,
+    int max = 100,
+    int defaultValue = 0,
+  }) {
     final parsed = int.tryParse(value ?? '');
     if (parsed == null) return defaultValue;
     return parsed.clamp(min, max);

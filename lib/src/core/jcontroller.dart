@@ -76,13 +76,13 @@ abstract class JController<T extends JState> extends StateNotifier<T> {
       return;
     }
 
-      final prev = currentState;
+    final prev = currentState;
 
-      state = newState;
+    state = newState;
 
-      JObserver.notifyStateChanged(prev, newState);
+    JObserver.notifyStateChanged(prev, newState);
 
-      debugPrint('State updated.');
+    debugPrint('State updated.');
   }
 
   /// Updates the current state by applying the given [reducer] function.
@@ -100,12 +100,12 @@ abstract class JController<T extends JState> extends StateNotifier<T> {
     }
     final newState = reducer(currentState);
 
-      final prev = currentState;
+    final prev = currentState;
 
-      state = newState;
+    state = newState;
 
-      JObserver.notifyStateChanged(prev, newState, origin);
-      debugPrint('State updated.');
+    JObserver.notifyStateChanged(prev, newState, origin);
+    debugPrint('State updated.');
   }
 
   /// Emits a one-time [JEffect] to the UI.

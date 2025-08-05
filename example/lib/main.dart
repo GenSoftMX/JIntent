@@ -14,7 +14,7 @@ void main() async {
   ]);
 
   enableLoggingObserver();
-  
+
   await Di().init();
 
   runApp(const ProviderScope(child: MyApp()));
@@ -28,7 +28,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
- 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(

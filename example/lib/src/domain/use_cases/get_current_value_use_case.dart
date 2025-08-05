@@ -1,7 +1,7 @@
 import 'package:jintent/jintent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class GetCurrentValueUseCase extends JUseCase<JNoParams,int > {
+class GetCurrentValueUseCase extends JUseCase<JNoParams, int> {
   final SharedPreferences _preferences;
 
   GetCurrentValueUseCase({required SharedPreferences preferences})

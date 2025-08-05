@@ -15,11 +15,9 @@ class SplashController extends JController<SplashState> {
       const Duration(seconds: 2),
     ).then((value) => emitSideEffect(NavigateEffect()));
   }
-  
+
   @override
-  void onInit() {
-    
-  }
+  void onInit() {}
 }
 
 class NavigateEffect extends JEffect {

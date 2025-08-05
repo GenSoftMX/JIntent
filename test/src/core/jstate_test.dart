@@ -9,10 +9,7 @@ class TestState extends JState {
 
   @override
   TestState copyWith({int? counter, String? text}) {
-    return TestState(
-      counter: counter ?? this.counter,
-      text: text ?? this.text,
-    );
+    return TestState(counter: counter ?? this.counter, text: text ?? this.text);
   }
 
   @override
