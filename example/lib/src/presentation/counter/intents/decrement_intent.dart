@@ -14,7 +14,7 @@ class DecrementIntent extends JIntent<CounterState> with JIntentHelpers {
     required SaveCurrentValueUseCase saveCurrentValueUseCase,
   }) : _decrementIntent = decrementUseCase,
        _saveCurrentValueUseCase = saveCurrentValueUseCase;
-       
+
   @override
   Future<void> onInvoke() async {
     final decrementResult = _decrementIntent.run(state.counter);
@@ -37,4 +37,3 @@ class DecrementIntent extends JIntent<CounterState> with JIntentHelpers {
     update((state) => state.copyWith(newStateCounter: value));
   }
 }
-

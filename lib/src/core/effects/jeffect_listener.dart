@@ -20,7 +20,7 @@ class JEffectListener<T extends JState> extends StatefulWidget {
 
   @override
   State<JEffectListener<T>> createState() => _JEffectListenerState<T>();
-} 
+}
 
 class _JEffectListenerState<T extends JState>
     extends State<JEffectListener<T>> {

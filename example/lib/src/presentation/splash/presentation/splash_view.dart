@@ -10,8 +10,8 @@ class SplashView extends ConsumerStatefulWidget {
   ConsumerState<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends ConsumerState<SplashView> with NavigationConsumer{
-
+class _SplashViewState extends ConsumerState<SplashView>
+    with NavigationConsumer {
   @override
   void initState() {
     final controller = ref.read(splashControllerProvider.notifier);
@@ -22,7 +22,7 @@ class _SplashViewState extends ConsumerState<SplashView> with NavigationConsumer
 
     controller.sideEffects.listen((effect) {
       if (mounted) {
-        navigation.go(context,'/counter');
+        navigation.go(context, '/counter');
       }
     });
 

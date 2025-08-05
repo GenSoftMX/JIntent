@@ -12,8 +12,7 @@ class MockController extends Mock implements JController<JState> {}
 class TestEffect extends JEffect<int> {}
 
 class TestHandler extends JSideEffectHandler<JState> {
-  TestHandler(JController<JState> controller)
-    : super(controller);
+  TestHandler(JController<JState> controller) : super(controller);
 }
 
 class MockBuildContext extends Mock implements BuildContext {}
@@ -33,7 +32,7 @@ void main() {
     final effect = TestEffect();
 
     var called = false;
-    handler.register<TestEffect>((eff, ctrl,context) async {
+    handler.register<TestEffect>((eff, ctrl, context) async {
       called = true;
       eff.complete(42);
     });
