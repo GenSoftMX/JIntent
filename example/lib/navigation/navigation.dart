@@ -47,7 +47,10 @@ class NavigatorImpl implements JNavigator {
     Map<String, String>? params,
     Object? extra,
   }) async {
-    final location = appRouter.namedLocation(name, queryParameters: params ?? {});
+    final location = appRouter.namedLocation(
+      name,
+      queryParameters: params ?? {},
+    );
     appRouter.push(location, extra: extra);
   }
 
@@ -58,7 +61,10 @@ class NavigatorImpl implements JNavigator {
     Map<String, String>? params,
     Object? extra,
   }) async {
-    final location = appRouter.namedLocation(name, queryParameters: params ?? {});
+    final location = appRouter.namedLocation(
+      name,
+      queryParameters: params ?? {},
+    );
     appRouter.go(location, extra: extra);
   }
 
@@ -76,7 +82,7 @@ class NavigatorImpl implements JNavigator {
   @override
   bool isCurrentRoute(BuildContext context, String path) {
     final uri = appRouter.routeInformationProvider.value.uri;
-  return uri.path == path;
+    return uri.path == path;
   }
 
   @override

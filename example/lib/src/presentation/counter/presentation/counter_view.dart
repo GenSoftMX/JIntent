@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jintent/jintent.dart';
 
 class CounterView extends ConsumerStatefulWidget {
-
   const CounterView({super.key});
 
   @override
@@ -16,10 +15,9 @@ class CounterView extends ConsumerStatefulWidget {
 class _CounterViewState extends ConsumerState<CounterView> {
   final throttler = JThrottler(const Duration(milliseconds: 200));
 
-
   late final CounterController _counterController;
 
- JSideEffectHandler<CounterState> get _sideEffectHandler =>
+  JSideEffectHandler<CounterState> get _sideEffectHandler =>
       CounterEffectHandler(_counterController);
 
   @override
@@ -44,7 +42,10 @@ class _CounterViewState extends ConsumerState<CounterView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const Text('You have pushed the button this many times:'),
-              Text('$counter', style: Theme.of(context).textTheme.headlineMedium),
+              Text(
+                '$counter',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
             ],
           ),
         ),

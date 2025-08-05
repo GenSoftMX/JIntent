@@ -1,3 +1,13 @@
+## [2.0.1] Bug Fix - (2025-08-05)
+
+### Fixed
+- State changes are now always notified in `JController`, even for internal mutations (such as modifying items within a list or map).
+- Removed equality check between previous and new state in the `setState` and `update` methods, ensuring that all state updates are propagated to listeners and debugging observers.
+
+### Notes
+- This update improves reactivity and observability for state changes that involve mutations within objects or collections.
+- No breaking changes to the API.
+
 ## 2.0.0 - Side Effects, UI Decoupling, Dependency Cleanup (2024/06/10)
 ✨ **New Features: Side Effects**
 - **Side Effect Stream:** Introduced a `Stream<JEffect>` inside `JController` to handle transient UI actions like navigation, dialogs, and snackbars. These are events that don't modify the application state but require a one-time reaction from the UI.

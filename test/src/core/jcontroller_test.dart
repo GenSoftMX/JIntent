@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jintent/jintent.dart';
 import 'package:mocktail/mocktail.dart';
 
-
 class MockIntent<T extends JState> extends Mock implements JIntent<T> {}
 
 class MockController<T extends JState> extends Mock implements JController<T> {}
@@ -58,8 +57,9 @@ void main() {
 
       // when(() => intent.runtimeType).thenReturn(Type);
       when(() => intent.run(controller)).thenAnswer((_) async {});
-      when(() => innerDispatcher.dispatch(intent, controller))
-          .thenAnswer((_) async {});
+      when(
+        () => innerDispatcher.dispatch(intent, controller),
+      ).thenAnswer((_) async {});
     });
 
     test('dispatch logs and calls inner dispatcher', () async {
@@ -72,10 +72,7 @@ void main() {
 
       expect(
         logs,
-        containsAll([
-          contains('Dispatching'),
-          contains('Completed'),
-        ]),
+        containsAll([contains('Dispatching'), contains('Completed')]),
       );
 
       verify(() => innerDispatcher.dispatch(intent, controller)).called(1);
@@ -84,5 +81,3 @@ void main() {
     });
   });
 }
-
-

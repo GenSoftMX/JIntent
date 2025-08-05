@@ -51,7 +51,8 @@ class JColorUtils {
   /// ```dart
   /// final color = ColorUtils.parseHex("#3498DB"); // Converts to Color(0xFF3498DB).
   /// ```
-  static Color parseHex(String value) => Color(int.parse(value.substring(1, 7), radix: 16) + 0xFF000000);
+  static Color parseHex(String value) =>
+      Color(int.parse(value.substring(1, 7), radix: 16) + 0xFF000000);
 
   /// Blends two colors with a specified opacity.
   ///

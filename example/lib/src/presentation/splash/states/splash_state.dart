@@ -1,4 +1,3 @@
-
 import 'package:jintent/jintent.dart';
 
 class SplashState extends JState {

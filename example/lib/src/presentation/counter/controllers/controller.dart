@@ -25,7 +25,7 @@ class CounterController extends JController<CounterState> {
   void increment() => intent(_incrementIntent);
 
   void decrement() => intent(_decrementIntent);
-  
+
   @override
-  void onInit() { }
+  void onInit() {}
 }

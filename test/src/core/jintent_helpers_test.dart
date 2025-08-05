@@ -31,11 +31,9 @@ void main() {
     intent.controller = mockController;
   });
 
-
   test('emitSideEffect calls controller.emitSideEffect', () {
     final effect = MockEffect();
     intent.emitSideEffect(effect);
     verify(mockController.emitSideEffect(effect)).called(1);
   });
 }
-

@@ -12,7 +12,7 @@ class CounterEffectHandler extends JSideEffectHandler<CounterState> {
   Future<void> _onDecrementSuccessfull(
     ShowRejectOperation effect,
     JController<CounterState> controller,
-    BuildContext context
+    BuildContext context,
   ) async {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

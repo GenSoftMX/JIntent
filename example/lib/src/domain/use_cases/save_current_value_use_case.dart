@@ -5,7 +5,7 @@ class SaveCurrentValueUseCase implements JUseCaseVoid<int> {
   final SharedPreferences _preferences;
 
   SaveCurrentValueUseCase({required SharedPreferences preferences})
-      : _preferences = preferences;
+    : _preferences = preferences;
 
   @override
   Future<void> run(int currentValue) async {

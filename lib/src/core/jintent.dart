@@ -18,7 +18,7 @@ abstract class JIntent<T extends JState> {
   late JController<T> _controller;
 
   /// DO NOT override this method.
-  /// It is used internally 
+  /// It is used internally
   /// Public method to execute the intent.
   Future<void> run(JController<T> controller) => invoke(controller);
 

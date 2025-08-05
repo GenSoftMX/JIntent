@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 /// Allows abstracting navigation logic to enable different implementations,
 /// making it easier to swap navigation managers without affecting the app.
 abstract class JNavigator {
-
   /// Navigates to a route by replacing the current one.
   /// [path] is the destination route as a string.
   Future<void> go(BuildContext context, String path);
@@ -33,13 +32,21 @@ abstract class JNavigator {
 
   /// Pushes a named route onto the stack.
   /// Supports optional path parameters and extra data.
-  Future<void> pushNamed(BuildContext context, String name,
-      {Map<String, String>? params, Object? extra});
+  Future<void> pushNamed(
+    BuildContext context,
+    String name, {
+    Map<String, String>? params,
+    Object? extra,
+  });
 
   /// Navigates to a named route by replacing the current one.
   /// Supports optional path parameters and extra data.
-  Future<void> goNamed(BuildContext context, String name,
-      {Map<String, String>? params, Object? extra});
+  Future<void> goNamed(
+    BuildContext context,
+    String name, {
+    Map<String, String>? params,
+    Object? extra,
+  });
 
   /// Pops the current route and returns a [result] to the previous one.
   void popWithResult<T>(BuildContext context, T result);

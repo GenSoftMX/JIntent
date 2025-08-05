@@ -11,7 +11,8 @@ class JObserver {
 
   /// Callback triggered when state changes from [prev] to [next].
   /// Optionally includes the originating intent.
-  static void Function(JState prev, JState next, JIntent? origin)? onStateChanged;
+  static void Function(JState prev, JState next, JIntent? origin)?
+  onStateChanged;
 
   /// Callback triggered when a side effect is emitted.
   static void Function(JEffect effect)? onEffectEmitted;

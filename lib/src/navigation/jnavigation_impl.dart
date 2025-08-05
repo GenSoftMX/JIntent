@@ -47,11 +47,7 @@ class JNavigatorImpl implements JNavigator {
     Map<String, String>? params,
     Object? extra,
   }) async {
-    await Navigator.pushNamed(
-      context,
-      name,
-      arguments: extra,
-    );
+    await Navigator.pushNamed(context, name, arguments: extra);
   }
 
   @override
@@ -61,11 +57,7 @@ class JNavigatorImpl implements JNavigator {
     Map<String, String>? params,
     Object? extra,
   }) async {
-    await Navigator.pushReplacementNamed(
-      context,
-      name,
-      arguments: extra,
-    );
+    await Navigator.pushReplacementNamed(context, name, arguments: extra);
   }
 
   @override
@@ -96,18 +88,12 @@ class JNavigatorImpl implements JNavigator {
 
   @override
   Future<T?> pushDialog<T>(BuildContext context, Widget dialog) {
-    return showDialog<T>(
-      context: context,
-      builder: (_) => dialog,
-    );
+    return showDialog<T>(context: context, builder: (_) => dialog);
   }
 
   @override
   Future<T?> pushReplacementDialog<T>(BuildContext context, Widget dialog) {
     Navigator.pop(context);
-    return showDialog<T>(
-      context: context,
-      builder: (_) => dialog,
-    );
+    return showDialog<T>(context: context, builder: (_) => dialog);
   }
 }
