@@ -20,7 +20,6 @@ import 'package:state_notifier/state_notifier.dart';
 ///
 /// Tracks state changes and side effects via [JObserver] for debugging and tooling.
 abstract class JController<T extends JState> extends StateNotifier<T> {
-
   /// Dispatcher responsible for handling the execution of [JIntent]s.
   ///
   /// This field holds an instance of [JIntentDispatcher], which abstracts
@@ -31,7 +30,7 @@ abstract class JController<T extends JState> extends StateNotifier<T> {
   /// It allows decoupling the dispatching mechanism from the controller logic.
   final JIntentDispatcher _dispatcher;
 
- /// Stream of side effects emitted by the controller.
+  /// Stream of side effects emitted by the controller.
   ///
   /// UI layers can subscribe to this stream to react to one-time effects,
   /// such as navigation, dialogs, snackbars, etc.
@@ -77,16 +76,13 @@ abstract class JController<T extends JState> extends StateNotifier<T> {
       return;
     }
 
-    if (currentState != newState) {
       final prev = currentState;
 
       state = newState;
 
       JObserver.notifyStateChanged(prev, newState);
+
       debugPrint('State updated.');
-    } else {
-      debugPrint('New state is equal to current state.');
-    }
   }
 
   /// Updates the current state by applying the given [reducer] function.
@@ -104,16 +100,12 @@ abstract class JController<T extends JState> extends StateNotifier<T> {
     }
     final newState = reducer(currentState);
 
-    if (currentState != newState) {
       final prev = currentState;
 
       state = newState;
 
       JObserver.notifyStateChanged(prev, newState, origin);
       debugPrint('State updated.');
-    } else {
-      debugPrint('New state is equal to current state.');
-    }
   }
 
   /// Emits a one-time [JEffect] to the UI.
