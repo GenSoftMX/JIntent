@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:jintent/src/core/dispachers/sequential_intent_dispatcher.dart';
 import 'package:jintent/src/core/effects/jeffect.dart';
 import 'package:jintent/src/core/jintent.dart';
 import 'package:jintent/src/devtools/jobserver.dart';
@@ -46,7 +47,7 @@ abstract class JController<T extends JState> extends StateNotifier<T> {
   ///
   /// Automatically calls [onInit] after construction.
   JController(T initialState, {JIntentDispatcher? dispatcher})
-    : _dispatcher = dispatcher ?? JDefaultIntentDispatcher(),
+    : _dispatcher = dispatcher ?? JSequentialIntentDispatcher(),
       super(initialState) {
     onInit();
   }
@@ -116,15 +117,20 @@ abstract class JController<T extends JState> extends StateNotifier<T> {
     JObserver.notifyEffectEmitted(effect);
   }
 
-  /// Emits a side effect and waits for the result.
-  ///
-  /// Used when a response from the UI is required, such as confirming an action.
-  ///
-  /// The UI must complete the effect using `effect.complete(value)`.
-  Future<V> emitAndWaitSideEffect<V>(JEffect<V> effect) {
+
+  Future<V> emitAndWaitSideEffect<V>(JEffect<V> effect,{Duration? timeout}) {
     emitSideEffect(effect);
-    JObserver.notifyEffectEmitted(effect);
-    return effect.result;
+
+    final future = timeout == null
+      ? effect.result
+      : effect.result.timeout(timeout, onTimeout: () {
+          if (!effect.isCompleted) {
+            effect.complete(null as V);
+          }
+          return null as V;
+        });
+
+    return future;
   }
 
   @override
