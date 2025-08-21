@@ -1,3 +1,11 @@
+## [2.1.0] - 2025-08-09
+### Added
+- Sequential intent handling to guarantee ordered, one-at-a-time processing.
+- Enhanced side effects system: effect IDs, completeError support, unhandledStrategy configurable y timeout.
+
+### Improvements
+- Mayor robustez y control operativo sobre la ejecución y diagnóstico de efectos.
+
 ## [2.0.1] Bug Fix - (2025-08-05)
 
 ### Fixed
