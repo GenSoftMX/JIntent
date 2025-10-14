@@ -1,0 +1,301 @@
+{
+  "metadata": {
+    "project_name": "JIntent",
+    "version": "2.1.0",
+    "commit_sha": "86700cb",
+    "analysis_date": "2025-10-14T21:53:08.245Z",
+    "analyst": "System Architecture & Governance Analyst",
+    "phase": "Phase 0 - Discovery"
+  },
+  "codebase": {
+    "primary_language": "Dart",
+    "framework": "Flutter",
+    "sdk_version": "^3.7.2",
+    "flutter_version": ">=1.17.0",
+    "library_files": {
+      "total": 30,
+      "by_layer": {
+        "core": 13,
+        "domain": 5,
+        "devtools": 4,
+        "navigation": 2,
+        "extensions": 1,
+        "utils": 5
+      }
+    },
+    "lines_of_code": {
+      "lib": 1567,
+      "average_per_file": 52
+    },
+    "test_files": {
+      "total": 9,
+      "by_layer": {
+        "core": 5,
+        "devtools": 2,
+        "domain": 2
+      }
+    }
+  },
+  "dependencies": {
+    "direct": {
+      "count": 3,
+      "list": [
+        {
+          "name": "equatable",
+          "version": "^2.0.5",
+          "purpose": "Value equality"
+        },
+        {
+          "name": "state_notifier",
+          "version": "^1.0.0",
+          "purpose": "State management base"
+        },
+        {
+          "name": "flutter",
+          "version": "SDK",
+          "purpose": "UI framework"
+        }
+      ]
+    },
+    "dev_dependencies": {
+      "count": 6,
+      "list": [
+        "flutter_test",
+        "test ^1.21.0",
+        "mockito ^5.4.0",
+        "mocktail ^1.0.4",
+        "build_runner ^2.4.7",
+        "flutter_lints ^2.0.0"
+      ]
+    },
+    "transitive": "Unknown - requires detailed analysis",
+    "outdated": [
+      {
+        "name": "flutter_lints",
+        "current": "^2.0.0",
+        "latest": "^5.0.0",
+        "severity": "Low"
+      }
+    ],
+    "vulnerabilities": {
+      "total": "Unknown - no scanning performed",
+      "critical": "Unknown",
+      "high": "Unknown",
+      "medium": "Unknown",
+      "low": "Unknown"
+    }
+  },
+  "testing": {
+    "coverage": {
+      "file_coverage_percent": 30,
+      "line_coverage_percent": "Unknown",
+      "branch_coverage_percent": "Unknown",
+      "note": "Only 9 of 30 library files have corresponding tests"
+    },
+    "test_counts": {
+      "unit": 9,
+      "integration": 0,
+      "e2e": 0,
+      "widget": 0,
+      "performance": 0,
+      "security": 0
+    },
+    "test_frameworks": [
+      "flutter_test",
+      "mockito",
+      "mocktail"
+    ]
+  },
+  "security": {
+    "owasp_asvs": {
+      "level_target": "L1",
+      "compliance_percent": 33,
+      "applicable_controls": 9,
+      "met": 0,
+      "partial": 3,
+      "missing": 6,
+      "note": "Partial controls counted as 0.5 for compliance calculation"
+    },
+    "vulnerabilities": {
+      "dependency_scan_performed": false,
+      "sast_scan_performed": false,
+      "known_vulnerabilities": "Unknown"
+    },
+    "security_files": {
+      "SECURITY_md": false,
+      "security_policy": false,
+      "vulnerability_disclosure": false
+    },
+    "authentication": "N/A - library package",
+    "authorization": "N/A - library package",
+    "cryptography": "None used",
+    "input_validation": "Validator pattern available - implementation by apps"
+  },
+  "exceptions_and_errors": {
+    "built_in_exceptions": {
+      "total": 4,
+      "types": [
+        {
+          "type": "StateError",
+          "count": 2,
+          "files": ["side_effect_handler.dart"],
+          "status": "Immutable"
+        },
+        {
+          "type": "TimeoutException",
+          "count": 1,
+          "files": ["jcontroller.dart"],
+          "status": "Immutable"
+        },
+        {
+          "type": "ArgumentError",
+          "count": 1,
+          "files": ["mapper.dart"],
+          "status": "Immutable"
+        }
+      ]
+    },
+    "error_handling_pattern": "Either<Exception, Result> monad (primary)",
+    "either_usage": "Core pattern - high usage in use cases",
+    "error_logging": "Optional via EitherConfig.configureLogger"
+  },
+  "ci_cd": {
+    "platform": "None",
+    "github_actions": false,
+    "automated_testing": false,
+    "automated_linting": false,
+    "automated_security_scan": false,
+    "automated_publish": false,
+    "quality_gates": false
+  },
+  "observability": {
+    "logging": {
+      "present": true,
+      "structured": false,
+      "levels": false,
+      "correlation_ids": false,
+      "pii_handling": false
+    },
+    "metrics": {
+      "collection": false,
+      "performance_counters": false,
+      "custom_metrics": false,
+      "note": "Effect IDs and timestamps available but not exposed"
+    },
+    "tracing": {
+      "present": false,
+      "distributed_tracing": false,
+      "span_context": false,
+      "note": "Effect IDs could be used as trace IDs"
+    },
+    "health_checks": "N/A - library package"
+  },
+  "documentation": {
+    "readme": true,
+    "changelog": true,
+    "code_of_conduct": true,
+    "contributing_guide": "Basic",
+    "license": "MIT",
+    "api_docs": "Inline - no generated reference",
+    "user_guides": {
+      "effects_guide": true,
+      "mapper_guide": true,
+      "migration_guides": false
+    },
+    "governance_docs": {
+      "adr_framework": false,
+      "architecture_docs": "Phase 0 (new)",
+      "security_docs": false
+    }
+  },
+  "quality_metrics": {
+    "pub_points": 160,
+    "pub_points_max": 160,
+    "pub_likes": "Unknown",
+    "linter_compliance": "100% with flutter_lints",
+    "code_complexity": "Low-Medium",
+    "maintainability_index": "High"
+  },
+  "risks": {
+    "critical": 2,
+    "high": 2,
+    "medium": 1,
+    "low": "Multiple",
+    "top_risks": [
+      {
+        "risk": "Dependency vulnerabilities undetected",
+        "category": "Security",
+        "probability": "High",
+        "impact": "High",
+        "priority": "CRITICAL"
+      },
+      {
+        "risk": "Inadequate test coverage leading to regressions",
+        "category": "Quality",
+        "probability": "High",
+        "impact": "High",
+        "priority": "CRITICAL"
+      },
+      {
+        "risk": "Breaking changes without migration path",
+        "category": "Maintainability",
+        "probability": "Medium",
+        "impact": "High",
+        "priority": "HIGH"
+      },
+      {
+        "risk": "Security vulnerability reporting channel unclear",
+        "category": "Security",
+        "probability": "Medium",
+        "impact": "High",
+        "priority": "HIGH"
+      },
+      {
+        "risk": "Side effect memory leaks in complex apps",
+        "category": "Performance",
+        "probability": "Medium",
+        "impact": "Medium",
+        "priority": "MEDIUM"
+      }
+    ]
+  },
+  "targets": {
+    "test_coverage": {
+      "baseline": 30,
+      "target": 80,
+      "phase": "Phase 2-3"
+    },
+    "security_compliance": {
+      "baseline": 33,
+      "target": 90,
+      "framework": "OWASP ASVS L1",
+      "phase": "Phase 2"
+    },
+    "dependency_vulnerabilities": {
+      "baseline": "Unknown",
+      "target": 0,
+      "severity": "High/Critical",
+      "phase": "Phase 1"
+    }
+  },
+  "next_actions": {
+    "immediate": [
+      "Establish CI/CD pipeline",
+      "Create SECURITY.md",
+      "Enable dependency scanning",
+      "Add test coverage reporting"
+    ],
+    "short_term": [
+      "Increase test coverage to 70%",
+      "Document error handling patterns",
+      "Security vulnerability assessment",
+      "Complete ADR-000 approval"
+    ],
+    "medium_term": [
+      "Achieve OWASP ASVS L1 90% compliance",
+      "Build integration test suite",
+      "Performance benchmarks",
+      "Migration guides"
+    ]
+  }
+}
