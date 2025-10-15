@@ -54,6 +54,46 @@ For more details, see the [full changelog](../CHANGELOG.md).
 
 ---
 
+## Error Handling in This Example
+
+This example demonstrates **comprehensive error handling patterns** with consistent UX:
+
+### Error Types Demonstrated
+
+1. **Validation Errors** (Red Snackbar 🔴)
+   - Try incrementing when counter is at 10
+   - Try decrementing when counter is at -10
+   - Shows error message with dismiss action
+
+2. **Success Feedback** (Green Snackbar 🟢)
+   - Reach milestones (every 10th increment)
+   - Automatic positive feedback
+
+3. **Multiple Severity Levels**
+   - Error (red) - validation failures
+   - Success (green) - milestones
+   - Warning (orange) - potential issues
+   - Info (blue) - informational messages
+   - Dialog - critical errors requiring attention
+
+### Effect Categories
+
+All effects are categorized for analytics:
+- `error` - Error snackbars
+- `success` - Success feedback
+- `warning` - Warning messages
+- `info` - Informational messages
+- `error_dialog` - Critical error dialogs
+
+### Documentation
+
+For a complete guide to the error handling patterns used in this app, see:
+- **[Error Handling Example Guide](./ERROR_HANDLING_EXAMPLE.md)** - Comprehensive documentation
+- **[Error Handling Guide](../docs/ERROR_HANDLING_GUIDE.md)** - General patterns and best practices
+- **[Global Error Handler Guide](../docs/GLOBAL_ERROR_HANDLER.md)** - Production-ready error handling
+
+---
+
 ## How to Run
 
 1. Ensure that you have Flutter installed on your machine.

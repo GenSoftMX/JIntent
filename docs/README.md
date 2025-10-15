@@ -198,6 +198,7 @@ JIntent is a lightweight, explicit Intent + State + Side Effect architecture for
 ### Example Application
 
 - [Example App](../example/) - Counter application demonstrating JIntent usage
+- [Error Handling Example](../example/ERROR_HANDLING_EXAMPLE.md) - Comprehensive error handling patterns in the counter app
 
 ---
 
@@ -274,10 +275,20 @@ JIntent is a lightweight, explicit Intent + State + Side Effect architecture for
    - Custom exception hierarchy
    - Global error handler configuration
    - Error handling by layer (presentation, domain, data)
+   - Error handling with side effects (JEffect patterns)
    - Advanced patterns (retry, circuit breaker, fallbacks)
    - Testing error scenarios
 
-3. **[API Versioning Strategy](./API_VERSIONING.md)** ✅
+3. **[Global Error Handler & Interceptor Guide](./GLOBAL_ERROR_HANDLER.md)** ✅
+   - Global error handling patterns
+   - Interceptor architecture (intent, use case, repository)
+   - Error aggregation and logging
+   - Analytics integration
+   - Crash reporting integration
+   - Production best practices (sampling, deduplication, rate limiting)
+   - Testing global handlers
+
+4. **[API Versioning Strategy](./API_VERSIONING.md)** ✅
    - Semantic versioning policy (SemVer 2.0.0)
    - Public API surface definition
    - Breaking change policy
@@ -287,7 +298,7 @@ JIntent is a lightweight, explicit Intent + State + Side Effect architecture for
 
 ### Code Examples
 
-4. **[Validation Examples](./examples/validation_examples.md)** ✅
+5. **[Validation Examples](./examples/validation_examples.md)** ✅
    - Basic validation patterns
    - Reusable validator library
    - Complex validation (passwords, credit cards)
@@ -295,7 +306,7 @@ JIntent is a lightweight, explicit Intent + State + Side Effect architecture for
    - Async validation
    - Error aggregation
 
-5. **[Error Handling Examples](./examples/error_handling_examples.md)** ✅
+6. **[Error Handling Examples](./examples/error_handling_examples.md)** ✅
    - Either pattern usage examples
    - Use case error handling patterns
    - Intent error handling with user feedback
