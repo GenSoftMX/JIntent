@@ -29,13 +29,12 @@ void main() {
         expect(result.right?.value, 5);
       });
 
-      test('returns Left when stored value is invalid', () async {
-        // Directly set invalid storage (simulating corrupted data)
-        repository._storage = null;
-
+      test('returns Left for first load without save', () async {
+        // Test that repository properly handles empty state
         final result = await repository.loadCounter();
 
         expect(result.isLeft, true);
+        expect(result.left.toString(), contains('No counter data found'));
       });
     });
 
