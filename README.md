@@ -18,6 +18,7 @@
 - Minimal Example
 - Side Effects
 - Concurrency & Ordering
+- Observability
 - Testing
 - Comparison
 - Migration (if any)
@@ -252,6 +253,134 @@ JIntent processes intents in a predictable, sequential order by default.
 Document your chosen concurrency policy in your controller, especially if you change the default behavior. This helps maintain clarity and prevents subtle bugs in complex flows.
 
 
+## Observability
+
+JIntent provides production-ready observability features for monitoring, debugging, and understanding your application's behavior.
+
+### Structured JSON Logging
+
+```dart
+import 'package:jintent/jintent.dart';
+
+void main() {
+  final logger = JStructuredLogger(
+    serviceName: 'my-app',
+    version: '1.0.0',
+    minLevel: LogLevel.info,
+  );
+  
+  logger.info('User logged in', context: {
+    'userId': '12345',
+    'action': 'login',
+  });
+  
+  runApp(MyApp());
+}
+```
+
+All logs are output as JSON for easy parsing:
+```json
+{
+  "timestamp": "2025-10-15T12:34:56.789Z",
+  "level": "INFO",
+  "message": "User logged in",
+  "service": "my-app",
+  "version": "1.0.0",
+  "context": {
+    "userId": "12345",
+    "action": "login"
+  }
+}
+```
+
+### Correlation IDs
+
+Track user actions across multiple operations:
+
+```dart
+// Wrap user actions in a correlation context
+await CorrelationContext.runWithCorrelation(() async {
+  await controller.dispatch(LoginIntent());
+  
+  // Access the correlation ID anywhere
+  final id = CorrelationContext.current;
+  logger.info('Processing', context: {'correlationId': id});
+});
+```
+
+### Metrics Collection
+
+Collect operational and performance metrics:
+
+```dart
+void main() {
+  // Enable metrics
+  JMetrics.enable();
+  JMetrics.attachToObserver();
+  
+  runApp(MyApp());
+}
+
+// Metrics are automatically tracked for:
+// - Intent dispatches
+// - State changes
+// - Effect emissions
+// - Execution timings
+```
+
+Manual metric recording:
+
+```dart
+// Counter
+JMetrics.incrementCounter('user.login');
+
+// Gauge
+JMetrics.recordGauge('active.users', userCount);
+
+// Timer
+final timerId = JMetrics.startTimer('api.request');
+await performOperation();
+JMetrics.stopTimer(timerId);
+```
+
+### Complete Observability Example
+
+```dart
+class LoginIntent extends JIntent<AuthState> {
+  final JStructuredLogger logger;
+
+  @override
+  Future<void> onInvoke() async {
+    await CorrelationContext.runWithCorrelation(() async {
+      final correlatedLogger = logger.withContext(
+        CorrelationContext.asContext ?? {},
+      );
+      
+      correlatedLogger.info('Login attempt started');
+      final timerId = JMetrics.startTimer('login.duration');
+      
+      try {
+        final user = await loginUseCase.execute();
+        JMetrics.incrementCounter('login.success');
+        JMetrics.stopTimer(timerId, tags: {'status': 'success'});
+        correlatedLogger.info('Login successful');
+        
+        update((state) => state.copyWith(user: user));
+      } catch (e) {
+        JMetrics.incrementCounter('login.failed');
+        JMetrics.stopTimer(timerId, tags: {'status': 'failed'});
+        correlatedLogger.error('Login failed', error: e);
+        
+        emitSideEffect(ShowErrorEffect(e.toString()));
+      }
+    });
+  }
+}
+```
+
+📖 **For comprehensive observability documentation, see [docs/OBSERVABILITY_GUIDE.md](docs/OBSERVABILITY_GUIDE.md)**
+
+
 ## Testing
 Recommended strategy:
 1. Given initial state
@@ -279,6 +408,10 @@ If upgrading from 1.x to 2.x:
 ## Roadmap (Short Term)
 - [✓] Formal concurrency policy documentation
 - [✓] Logging observer utility
+- [✓] Structured JSON logging (Phase 3)
+- [✓] Correlation ID support (Phase 3)
+- [✓] Metrics collection framework (Phase 3)
+- [✓] Integration test examples (Phase 3)
 - [ ] Advanced examples (debounce, pagination, streaming)
 - [ ] DevTool overlay (visualize intents/states)
 - [ ] Undo/Redo experiment
