@@ -4,8 +4,8 @@
 ![License](https://img.shields.io/github/license/GenSoftMX/JIntent)
 ![Pub Points](https://img.shields.io/badge/pub%20points-160/160-informational)
 ![Likes](https://img.shields.io/pub/likes/jintent)
-<!-- ![Build](https://img.shields.io/github/actions/workflow/status/GenSoftMX/JIntent/ci.yml?branch=main) -->
-<!-- ![Coverage](https://img.shields.io/badge/coverage-XX%25-yellow) -->
+![Build](https://img.shields.io/github/actions/workflow/status/GenSoftMX/JIntent/ci.yml?branch=main)
+![Coverage](https://img.shields.io/badge/coverage-checking-yellow)
 
 > Lightweight, explicit Intent + State + Side Effect architecture for Flutter (MVI-inspired)  
 
@@ -311,6 +311,15 @@ This document sets the official policies and guidelines for collaboration.
   - **Unit and/or integration tests**.
   - An entry in **CHANGELOG.md** under `[Unreleased]`.
   - Compliance with the project’s **linting and formatting** rules.
+
+### CI/CD Pipeline
+- All PRs trigger automated checks via GitHub Actions:
+  - **Code formatting** (`dart format`)
+  - **Static analysis** (`flutter analyze`)
+  - **Test suite** with coverage report
+  - **Coverage threshold** enforcement (≥80%)
+- PRs cannot merge until all checks pass.
+- Coverage reports are available as artifacts in the workflow runs.
 
 ## 4. Pull Requests
 - PRs must be clear, concise, and focused only on related changes.  
