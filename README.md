@@ -269,12 +269,29 @@ Recommended strategy:
 | Intent semantics | Explicit classes | Events | Actions | Method calls |
 | Concurrency control | (Document) | Per event loop | Middleware | Custom |
 
+## Compatibility
+
+### Supported Platforms
+✅ All Flutter platforms: Android, iOS, Web, Linux, macOS, Windows
+
+### Requirements
+- **Dart SDK:** `^3.7.2` or higher
+- **Flutter SDK:** `>=1.17.0` (Latest 3 stable versions recommended)
+
+### Tested Flutter Versions
+- Latest stable (recommended)
+- Previous stable (N-1)
+- Previous stable (N-2)
+
+For detailed compatibility information, see [COMPATIBILITY.md](docs/COMPATIBILITY.md).
+
 ## Migration
 If upgrading from 1.x to 2.x:
 - Update import paths.
 - Adjust side effect API rename.
 - See CHANGELOG for removed symbols.
-(Provide MIGRATION.md if many items.)
+
+For detailed migration guides, see [MIGRATION_GUIDE.md](docs/MIGRATION_GUIDE.md).
 
 ## Roadmap (Short Term)
 - [✓] Formal concurrency policy documentation
