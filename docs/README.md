@@ -12,6 +12,7 @@ This directory contains comprehensive baseline documentation for the JIntent Flu
 2. **[Repository Analysis](./REPOSITORY_ANALYSIS.md)** - Comprehensive technical analysis
 3. **[Exception Inventory](./EXCEPTION_INVENTORY.md)** - Error handling catalog
 4. **[Discovery Phase Complete](./DISCOVERY_PHASE_COMPLETE.md)** - Phase 0 completion report
+5. **[Gate A1 Decisions](./GATE_A1_DECISIONS.md)** - Discovery Phase approval decisions
 
 ### Architecture Decision Records (ADRs)
 

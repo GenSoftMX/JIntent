@@ -1,7 +1,8 @@
 # ADR-000: Context and High-Level Decisions
 
-**Status:** Draft  
+**Status:** Approved  
 **Date:** 2025-10-14  
+**Approved:** 2025-10-15  
 **Deciders:** JIntent Maintainers (GenSoftMX)  
 **Version:** 2.1.0 Baseline
 
@@ -9,7 +10,7 @@
 
 ## Status
 
-🟡 **DRAFT** - Awaiting stakeholder review and approval
+✅ **APPROVED** - Stakeholder review completed on 2025-10-15 (Gate A1)
 
 This ADR captures the baseline architectural decisions as of version 2.1.0. It serves as the foundation for all future ADRs.
 
@@ -424,9 +425,9 @@ abstract class JUseCase<INPUT, OUTPUT> {
 
 | Role | Name | Status | Date |
 |------|------|--------|------|
-| Tech Lead | TBD | Pending | - |
-| Security Champion | TBD | Pending | - |
-| Maintainer | GenSoftMX | Pending | - |
+| Tech Lead | Acting Tech Lead | ✅ Approved | 2025-10-15 |
+| Security Champion | Acting Security Champion | ✅ Approved | 2025-10-15 |
+| Maintainer | GenSoftMX (Acting) | ✅ Approved | 2025-10-15 |
 
 ---
 
