@@ -40,5 +40,12 @@ class IncrementIntent extends JIntent<CounterState> with JIntentHelpers {
     _saveCurrentValueUseCase.run(value);
 
     update((state) => state.copyWith(newStateCounter: value));
+    
+    // Show success feedback for every 10th increment
+    if (value % 10 == 0) {
+      controller.emitSideEffect(
+        ShowSuccessEffect(message: 'Milestone reached: $value!'),
+      );
+    }
   }
 }

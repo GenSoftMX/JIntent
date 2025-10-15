@@ -15,9 +15,10 @@
 4. [Exception Patterns](#4-exception-patterns)
 5. [Global Error Handling](#5-global-error-handling)
 6. [Error Handling in Layers](#6-error-handling-in-layers)
-7. [Best Practices](#7-best-practices)
-8. [Common Patterns](#8-common-patterns)
-9. [Testing Error Scenarios](#9-testing-error-scenarios)
+7. [Error Handling with Side Effects](#7-error-handling-with-side-effects)
+8. [Best Practices](#8-best-practices)
+9. [Common Patterns](#9-common-patterns)
+10. [Testing Error Scenarios](#10-testing-error-scenarios)
 
 ---
 
@@ -668,9 +669,493 @@ class AuthRepositoryImpl implements AuthRepository {
 
 ---
 
-## 7. Best Practices
+## 7. Error Handling with Side Effects
 
-### 7.1 Do's ✅
+### 7.1 Overview
+
+JIntent's side effect system (`JEffect`) provides a clean way to handle transient UI events like errors, notifications, and confirmations. This section covers how to use side effects for error communication between the domain layer and the UI.
+
+### 7.2 Error Effect Types
+
+Define custom error effects to communicate different error severities:
+
+```dart
+/// Base error effect
+abstract class ErrorEffect extends JFireAndForgetEffect {
+  final String message;
+  final ErrorSeverity severity;
+  
+  ErrorEffect(this.message, this.severity);
+}
+
+/// Error severity levels
+enum ErrorSeverity {
+  info,      // Informational messages
+  warning,   // Warning messages
+  error,     // Error messages that require attention
+  critical,  // Critical errors that may block functionality
+}
+
+/// Show snackbar/toast error
+class ShowSnackbarEffect extends ErrorEffect {
+  ShowSnackbarEffect({
+    required String message,
+    ErrorSeverity severity = ErrorSeverity.error,
+  }) : super(message, severity);
+}
+
+/// Show error dialog
+class ShowErrorDialogEffect extends JDialogEffect<bool> {
+  final String title;
+  final String message;
+  final String? actionLabel;
+  
+  ShowErrorDialogEffect({
+    required this.title,
+    required this.message,
+    this.actionLabel,
+  });
+}
+
+/// Show validation errors
+class ShowValidationErrorEffect extends ErrorEffect {
+  final Map<String, String> fieldErrors;
+  
+  ShowValidationErrorEffect({
+    required String message,
+    required this.fieldErrors,
+  }) : super(message, ErrorSeverity.warning);
+}
+
+/// Network error with retry option
+class ShowNetworkErrorEffect extends JDialogEffect<bool> {
+  final String message;
+  final VoidCallback? onRetry;
+  
+  ShowNetworkErrorEffect({
+    required this.message,
+    this.onRetry,
+  });
+}
+```
+
+### 7.3 Emitting Error Effects from Intents
+
+```dart
+class LoginIntent extends JIntent<AuthState> {
+  final String email;
+  final String password;
+  final LoginUseCase _loginUseCase;
+
+  LoginIntent(this.email, this.password, this._loginUseCase);
+
+  @override
+  Future<void> onInvoke() async {
+    controller.update((state) => state.copyWith(isLoading: true));
+
+    final result = await _loginUseCase(LoginInput(
+      email: email,
+      password: password,
+    ));
+
+    result.fold(
+      (exception) {
+        // Update state
+        controller.update((state) => state.copyWith(
+          isLoading: false,
+          error: exception.toString(),
+        ));
+
+        // Emit appropriate error effect based on exception type
+        if (exception is ValidationException) {
+          controller.emitSideEffect(ShowSnackbarEffect(
+            message: exception.message,
+            severity: ErrorSeverity.warning,
+          ));
+        } else if (exception is NetworkException) {
+          controller.emitSideEffect(ShowNetworkErrorEffect(
+            message: 'No internet connection. Please try again.',
+            onRetry: () => controller.intent(this),
+          ));
+        } else if (exception is AuthenticationException) {
+          controller.emitSideEffect(ShowErrorDialogEffect(
+            title: 'Login Failed',
+            message: exception.message,
+            actionLabel: 'Try Again',
+          ));
+        } else {
+          controller.emitSideEffect(ShowSnackbarEffect(
+            message: 'An unexpected error occurred',
+            severity: ErrorSeverity.error,
+          ));
+        }
+      },
+      (authToken) {
+        controller.update((state) => state.copyWith(
+          isLoading: false,
+          isAuthenticated: true,
+          userId: authToken.userId,
+          error: null,
+        ));
+
+        controller.emitSideEffect(NavigateToHomeEffect());
+      },
+    );
+  }
+}
+```
+
+### 7.4 Handling Error Effects in UI
+
+Create a centralized effect handler to display errors consistently:
+
+```dart
+class AppEffectHandler extends JSideEffectHandler<AppState> {
+  AppEffectHandler(super.controller) {
+    register<ShowSnackbarEffect>(_handleSnackbar);
+    register<ShowErrorDialogEffect>(_handleErrorDialog);
+    register<ShowValidationErrorEffect>(_handleValidationError);
+    register<ShowNetworkErrorEffect>(_handleNetworkError);
+  }
+
+  Future<void> _handleSnackbar(
+    ShowSnackbarEffect effect,
+    JController<AppState> controller,
+    BuildContext context,
+  ) async {
+    final color = _getColorForSeverity(effect.severity);
+    final icon = _getIconForSeverity(effect.severity);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white),
+            SizedBox(width: 8),
+            Expanded(child: Text(effect.message)),
+          ],
+        ),
+        backgroundColor: color,
+        duration: Duration(seconds: effect.severity == ErrorSeverity.error ? 5 : 3),
+        action: SnackBarAction(
+          label: 'DISMISS',
+          textColor: Colors.white,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+
+    effect.complete(null);
+  }
+
+  Future<void> _handleErrorDialog(
+    ShowErrorDialogEffect effect,
+    JController<AppState> controller,
+    BuildContext context,
+  ) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.red),
+            SizedBox(width: 8),
+            Text(effect.title),
+          ],
+        ),
+        content: Text(effect.message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('CANCEL'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(effect.actionLabel ?? 'OK'),
+          ),
+        ],
+      ),
+    );
+
+    effect.complete(result ?? false);
+  }
+
+  Future<void> _handleValidationError(
+    ShowValidationErrorEffect effect,
+    JController<AppState> controller,
+    BuildContext context,
+  ) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.warning, color: Colors.white),
+                SizedBox(width: 8),
+                Text(effect.message),
+              ],
+            ),
+            if (effect.fieldErrors.isNotEmpty) ...[
+              SizedBox(height: 8),
+              ...effect.fieldErrors.entries.map((entry) => Text(
+                '• ${entry.key}: ${entry.value}',
+                style: TextStyle(fontSize: 12),
+              )),
+            ],
+          ],
+        ),
+        backgroundColor: Colors.orange,
+        duration: Duration(seconds: 5),
+      ),
+    );
+
+    effect.complete(null);
+  }
+
+  Future<void> _handleNetworkError(
+    ShowNetworkErrorEffect effect,
+    JController<AppState> controller,
+    BuildContext context,
+  ) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.wifi_off, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Network Error'),
+          ],
+        ),
+        content: Text(effect.message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('CANCEL'),
+          ),
+          if (effect.onRetry != null)
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+                effect.onRetry?.call();
+              },
+              child: Text('RETRY'),
+            ),
+        ],
+      ),
+    );
+
+    effect.complete(result ?? false);
+  }
+
+  Color _getColorForSeverity(ErrorSeverity severity) {
+    switch (severity) {
+      case ErrorSeverity.info:
+        return Colors.blue;
+      case ErrorSeverity.warning:
+        return Colors.orange;
+      case ErrorSeverity.error:
+        return Colors.red;
+      case ErrorSeverity.critical:
+        return Colors.red.shade900;
+    }
+  }
+
+  IconData _getIconForSeverity(ErrorSeverity severity) {
+    switch (severity) {
+      case ErrorSeverity.info:
+        return Icons.info_outline;
+      case ErrorSeverity.warning:
+        return Icons.warning_amber;
+      case ErrorSeverity.error:
+        return Icons.error_outline;
+      case ErrorSeverity.critical:
+        return Icons.cancel;
+    }
+  }
+}
+```
+
+### 7.5 Error Effect Best Practices
+
+#### 1. Use Fire-and-Forget for Non-Blocking Errors
+
+```dart
+// ✅ Good - snackbar doesn't need a response
+class ShowSnackbarEffect extends JFireAndForgetEffect {
+  final String message;
+  ShowSnackbarEffect(this.message);
+}
+
+// ❌ Bad - unnecessary dialog for simple errors
+class ShowSimpleErrorEffect extends JDialogEffect<void> {
+  final String message;
+  ShowSimpleErrorEffect(this.message);
+}
+```
+
+#### 2. Use Dialog Effects for Critical Errors
+
+```dart
+// ✅ Good - critical error needs user acknowledgment
+class ShowCriticalErrorEffect extends JDialogEffect<bool> {
+  final String message;
+  ShowCriticalErrorEffect(this.message);
+}
+```
+
+#### 3. Provide Contextual Error Messages
+
+```dart
+// ❌ Bad
+controller.emitSideEffect(ShowSnackbarEffect('Error'));
+
+// ✅ Good
+controller.emitSideEffect(ShowSnackbarEffect(
+  message: 'Failed to save user profile. Please check your internet connection.',
+  severity: ErrorSeverity.error,
+));
+```
+
+#### 4. Include Recovery Actions
+
+```dart
+// ✅ Good - provide retry mechanism
+controller.emitSideEffect(ShowNetworkErrorEffect(
+  message: 'Unable to load data',
+  onRetry: () => controller.intent(LoadDataIntent()),
+));
+```
+
+#### 5. Complete Effects Properly
+
+```dart
+// ✅ Good - always complete effects
+Future<void> _handleError(
+  ShowErrorEffect effect,
+  JController controller,
+  BuildContext context,
+) async {
+  // Show error
+  await showDialog(...);
+  
+  // Complete the effect
+  effect.complete(null);
+}
+
+// ❌ Bad - forgot to complete
+Future<void> _handleError(
+  ShowErrorEffect effect,
+  JController controller,
+  BuildContext context,
+) async {
+  await showDialog(...);
+  // Effect never completed - will cause warnings
+}
+```
+
+### 7.6 Error Effect Timeout Handling
+
+Configure timeout behavior for awaitable error effects:
+
+```dart
+class ConfirmDangerousActionIntent extends JIntent<AppState> {
+  @override
+  Future<void> onInvoke() async {
+    try {
+      final confirmed = await controller.emitAndWaitSideEffect(
+        ShowConfirmationDialogEffect(
+          title: 'Delete Account?',
+          message: 'This action cannot be undone.',
+        ),
+        timeout: Duration(seconds: 30),
+      );
+
+      if (confirmed) {
+        // Proceed with dangerous action
+        await _deleteAccountUseCase();
+      }
+    } on TimeoutException {
+      // User didn't respond in time
+      controller.emitSideEffect(ShowSnackbarEffect(
+        message: 'Confirmation timeout. Action cancelled.',
+        severity: ErrorSeverity.warning,
+      ));
+    }
+  }
+}
+```
+
+### 7.7 Unhandled Effect Strategy
+
+Configure how unhandled error effects are treated:
+
+```dart
+void main() {
+  // Configure unhandled effect strategy
+  JEffectsConfig().unhandledStrategy = UnhandledEffectStrategy.throwError;
+  
+  runApp(MyApp());
+}
+```
+
+Strategies:
+- **warnOnly**: Log a warning (development only)
+- **warnAndAutoComplete**: Log and auto-complete with null (default)
+- **throwError**: Throw an error for unhandled awaitable effects
+
+### 7.8 Error Effect Categories
+
+Use categories to group error effects for analytics and debugging:
+
+```dart
+class ShowErrorEffect extends JFireAndForgetEffect with JCategorizableEffect {
+  final String message;
+  
+  ShowErrorEffect(this.message);
+  
+  @override
+  String get category => 'error_feedback';
+}
+
+class ShowNetworkErrorEffect extends JDialogEffect<bool> with JCategorizableEffect {
+  final String message;
+  
+  ShowNetworkErrorEffect(this.message);
+  
+  @override
+  String get category => 'error_network';
+}
+```
+
+This enables filtering in devtools and analytics:
+
+```dart
+// Track error effects by category
+controller.sideEffects
+  .where((effect) => effect.resolvedCategory?.startsWith('error_') ?? false)
+  .listen((effect) {
+    analytics.logErrorShown(
+      category: effect.resolvedCategory,
+      effectType: effect.runtimeType.toString(),
+    );
+  });
+```
+
+---
+
+## 8. Best Practices
+
+### 8.1 Do's ✅
 
 #### 1. Use Either for Expected Errors
 
@@ -986,7 +1471,7 @@ class ValidateFormUseCase extends JUseCase<FormInput, ValidatedForm> {
 
 ---
 
-## 9. Testing Error Scenarios
+## 9. Common Patterns
 
 ### 9.1 Testing Either Results
 
@@ -1120,9 +1605,9 @@ void main() {
 
 ---
 
-## 10. Additional Resources
+## 10. Testing Error Scenarios
 
-### 10.1 Related Documentation
+### 10.1 Testing Use Case Errors
 
 **JIntent Guides:**
 - [Security Guide](./SECURITY_GUIDE.md) - Error security considerations and logging
@@ -1139,7 +1624,7 @@ void main() {
 - [Documentation Index](./README.md) - Complete documentation navigation
 - [Exception Inventory](./EXCEPTION_INVENTORY.md) - Exception governance and catalog
 
-### 10.2 Code Examples
+### 10.2 Testing Intent Error Handling
 
 **Example Application:**
 - `example/lib/src/domain/use_cases/` - Use case error handling
@@ -1150,7 +1635,84 @@ void main() {
 - [Error Handling Examples](./examples/error_handling_examples.md) - Comprehensive code samples
 - [Validation Examples](./examples/validation_examples.md) - Input validation patterns
 
-### 10.3 Community & Support
+### 10.3 Testing Error Effects
+
+```dart
+void main() {
+  group('Error Effect Tests', () {
+    late AppController controller;
+    late AppEffectHandler handler;
+
+    setUp(() {
+      controller = AppController();
+      handler = AppEffectHandler(controller);
+    });
+
+    test('emits ShowSnackbarEffect when login fails', () async {
+      final effects = <JEffect>[];
+      controller.sideEffects.listen(effects.add);
+
+      await controller.intent(LoginIntent(
+        email: 'test@example.com',
+        password: 'wrong',
+        mockLoginUseCase: MockLoginUseCase()..shouldFail = true,
+      ));
+
+      expect(effects.length, 1);
+      expect(effects.first, isA<ShowSnackbarEffect>());
+      expect((effects.first as ShowSnackbarEffect).message, contains('Invalid'));
+    });
+
+    test('completes ShowErrorDialogEffect properly', () async {
+      final effect = ShowErrorDialogEffect(
+        title: 'Test Error',
+        message: 'Test message',
+      );
+
+      await handler.handle(effect, controller, MockBuildContext());
+
+      expect(effect.isCompleted, isTrue);
+    });
+  });
+}
+```
+
+---
+
+## 11. Additional Resources
+
+### 11.1 Related Documentation
+
+**JIntent Guides:**
+- [Security Guide](./SECURITY_GUIDE.md) - Error security considerations and logging
+- [API Versioning Guide](./API_VERSIONING.md) - Error handling in version migrations
+- [Validation Examples](./examples/validation_examples.md) - Input validation patterns
+- [Error Handling Examples](./examples/error_handling_examples.md) - Practical error handling code
+- [Global Error Handler Guide](./GLOBAL_ERROR_HANDLER.md) - Centralized error interception and handling
+- [Effects Guide](../doc/effects.md) - Complete side effects documentation
+
+**Architecture Decision Records:**
+- [ADR-006: Error Handling Patterns](./adr/ADR-006-error-handling-patterns.md) - Error strategy decisions
+- [ADR-007: Validation Framework](./adr/ADR-007-validation-framework.md) - Validation approach
+- [ADR-005: Security Architecture](./adr/ADR-005-security-architecture.md) - Security error handling
+
+**Project Documentation:**
+- [Documentation Index](./README.md) - Complete documentation navigation
+- [Exception Inventory](./EXCEPTION_INVENTORY.md) - Exception governance and catalog
+
+### 11.2 Code Examples
+
+**Example Application:**
+- `example/lib/src/domain/use_cases/` - Use case error handling
+- `example/lib/src/presentation/intents/` - Intent error handling
+- `example/lib/src/data/repositories/` - Repository error handling
+- `example/lib/src/presentation/*/effect_handler.dart` - Effect handler implementations
+
+**Example Documentation:**
+- [Error Handling Examples](./examples/error_handling_examples.md) - Comprehensive code samples
+- [Validation Examples](./examples/validation_examples.md) - Input validation patterns
+
+### 11.3 Community & Support
 
 - [GitHub Issues](https://github.com/GenSoftMX/JIntent/issues) - Report bugs or request features
 - [GitHub Discussions](https://github.com/GenSoftMX/JIntent/discussions) - Ask questions and share ideas
