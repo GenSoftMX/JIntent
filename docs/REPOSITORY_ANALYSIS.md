@@ -833,6 +833,8 @@ Health checks are the responsibility of applications using JIntent.
 
 JIntent is a state management library without built-in persistence. Database integration is left to applications.
 
+**📖 Complete Guide Available:** See [DATA_LAYER_GUIDE.md](./DATA_LAYER_GUIDE.md) for comprehensive patterns and examples.
+
 ### 7.2 Data Layer Abstractions
 
 **Provided Abstractions:**
@@ -841,11 +843,17 @@ JIntent is a state management library without built-in persistence. Database int
    - Purpose: Transform between types (DTO ↔ Entity)
    - Usage: Data layer transformations
    - Features: Single/list/dynamic mapping
+   - Documentation: [MAPPER_READER.md](../doc/MAPPER_READER.md)
 
 2. **Either<Exception, T>**
    - Purpose: Represent success/failure
    - Usage: Repository method returns
    - Features: Type-safe error handling
+
+3. **IBiMapper<A, B>**
+   - Purpose: Bidirectional transformations
+   - Usage: Entity ↔ DTO conversions
+   - Features: Reversible transformations
 
 **Example Usage:**
 ```dart
@@ -863,6 +871,13 @@ class UserRepository {
 }
 ```
 
+**Complete Example:** See `example/lib/src/data/` for full implementation with:
+- Repository interfaces and implementations
+- Mapper patterns (JMapper and IBiMapper)
+- ArgumentError handling and recovery
+- Caching strategies
+- Comprehensive tests
+
 ### 7.3 Data Validation
 
 **Built-in:** `UseCaseInputValidator<I>`
@@ -876,9 +891,36 @@ useCase.addValidator((input) {
 });
 ```
 
+**Validation Layers:**
+1. **Repository Level**: Business rules and constraints
+2. **Mapper Level**: Data format and structure validation
+3. **Use Case Level**: Input validation with `UseCaseInputValidator`
+
+See [Validation Examples](./examples/validation_examples.md) for comprehensive patterns.
+
 ### 7.4 Migration Strategy
 
 **Status:** Not Applicable (no database)
+
+### 7.5 Phase 2 Deliverables (Complete)
+
+✅ **Data Layer Guide**: Comprehensive documentation in [DATA_LAYER_GUIDE.md](./DATA_LAYER_GUIDE.md)
+
+✅ **Mapper Patterns**: 
+   - Tests with ArgumentError examples: `test/src/domain/mapper_test.dart`
+   - Example implementations: `example/lib/src/data/mappers/`
+   - Bidirectional and one-way patterns demonstrated
+
+✅ **Repository Example**:
+   - Interface and implementations: `example/lib/src/data/repositories/`
+   - In-memory, cached, and failing mock implementations
+   - Either-based error handling throughout
+   - Comprehensive test suite: `example/test/src/data/`
+
+✅ **Documentation**:
+   - [DATA_LAYER_GUIDE.md](./DATA_LAYER_GUIDE.md) - Main guidance document
+   - [example/lib/src/data/README.md](../example/lib/src/data/README.md) - Example app documentation
+   - Updated CHANGELOG.md with Phase 2 additions
 
 ---
 

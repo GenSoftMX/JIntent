@@ -1,3 +1,15 @@
+## [Unreleased]
+### Documentation
+- **Data Layer Guide**: Added comprehensive `docs/DATA_LAYER_GUIDE.md` covering repository patterns, mappers, Either-based error handling, and validation pipelines
+- **Mapper Tests**: Added `test/src/domain/mapper_test.dart` demonstrating ArgumentError handling and recovery patterns
+- **Example Repository**: Added complete repository example in `example/lib/src/data/` showing:
+  - Repository interface and implementations (in-memory, cached, failing mock)
+  - Mapper patterns (JMapper and IBiMapper)
+  - Either-based error handling
+  - ArgumentError handling and recovery
+  - Validation at multiple layers
+- **Example Tests**: Added comprehensive tests for mappers and repositories demonstrating best practices
+
 ## [2.1.0] - 2025-08-09
 ### Added
 - Sequential intent handling to guarantee ordered, one-at-a-time processing.
