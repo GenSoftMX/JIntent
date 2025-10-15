@@ -4,8 +4,8 @@
 ![License](https://img.shields.io/github/license/GenSoftMX/JIntent)
 ![Pub Points](https://img.shields.io/badge/pub%20points-160/160-informational)
 ![Likes](https://img.shields.io/pub/likes/jintent)
-<!-- ![Build](https://img.shields.io/github/actions/workflow/status/GenSoftMX/JIntent/ci.yml?branch=main) -->
-<!-- ![Coverage](https://img.shields.io/badge/coverage-XX%25-yellow) -->
+![Build](https://img.shields.io/github/actions/workflow/status/GenSoftMX/JIntent/ci.yml?branch=main)
+![Coverage](https://img.shields.io/badge/coverage-checking-yellow)
 
 > Lightweight, explicit Intent + State + Side Effect architecture for Flutter (MVI-inspired)  
 
