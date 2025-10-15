@@ -312,6 +312,15 @@ This document sets the official policies and guidelines for collaboration.
   - An entry in **CHANGELOG.md** under `[Unreleased]`.
   - Compliance with the project’s **linting and formatting** rules.
 
+### CI/CD Pipeline
+- All PRs trigger automated checks via GitHub Actions:
+  - **Code formatting** (`dart format`)
+  - **Static analysis** (`flutter analyze`)
+  - **Test suite** with coverage report
+  - **Coverage threshold** enforcement (≥80%)
+- PRs cannot merge until all checks pass.
+- Coverage reports are available as artifacts in the workflow runs.
+
 ## 4. Pull Requests
 - PRs must be clear, concise, and focused only on related changes.  
 - The PR description should include:
