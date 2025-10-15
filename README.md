@@ -283,6 +283,26 @@ If upgrading from 1.x to 2.x:
 - [ ] DevTool overlay (visualize intents/states)
 - [ ] Undo/Redo experiment
 
+## Documentation
+
+### Core Documentation
+- **[Effects Guide](./doc/effects.md)** - Comprehensive side effects system documentation
+- **[Mapper Reader](./doc/MAPPER_READER.md)** - Data mapping utilities
+
+### Security & Best Practices
+- **[Security Guide](./docs/SECURITY_GUIDE.md)** - OWASP ASVS compliance, input validation, secure state management
+- **[Error Handling Guide](./docs/ERROR_HANDLING_GUIDE.md)** - Either patterns, exception handling, global error handlers
+- **[API Versioning](./docs/API_VERSIONING.md)** - Semantic versioning policy, breaking changes, deprecation process
+
+### Code Examples
+- **[Validation Examples](./docs/examples/validation_examples.md)** - Input validation patterns and reusable validators
+- **[Error Handling Examples](./docs/examples/error_handling_examples.md)** - Practical error handling patterns
+
+### Governance & Architecture
+- **[Documentation Index](./docs/README.md)** - Complete documentation navigation
+- **[ADR-000 to ADR-009](./docs/adr/)** - Architecture Decision Records
+- **[Executive Summary](./docs/EXECUTIVE_SUMMARY.md)** - Project overview and roadmap
+
 # Contributing Guidelines
 
 Thank you for your interest in contributing to this project.  
