@@ -1,52 +1,54 @@
+---
 name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   analyze-and-test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.27.2'
           channel: 'stable'
           cache: true
-      
+
       - name: Get dependencies
         run: flutter pub get
-      
+
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
-      
+
       - name: Analyze code
         run: flutter analyze
-      
+
       - name: Run tests with coverage
         run: flutter test --coverage
-      
+
       - name: Check coverage threshold
         run: |
           # Install lcov tools
           sudo apt-get update
           sudo apt-get install -y lcov
-          
+
           # Generate coverage report
           genhtml coverage/lcov.info -o coverage/html
-          
+
           # Extract coverage percentage
-          COVERAGE=$(lcov --summary coverage/lcov.info 2>&1 | grep "lines" | awk '{print $2}' | sed 's/%//')
-          
+          COVERAGE=$(lcov --summary coverage/lcov.info 2>&1 | \
+            grep "lines" | awk '{print $2}' | sed 's/%//')
+
           echo "Coverage: $COVERAGE%"
-          
+
           # Check if coverage meets threshold (80%)
           THRESHOLD=80
           if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
@@ -55,14 +57,14 @@ jobs:
           else
             echo "✅ Coverage $COVERAGE% meets threshold $THRESHOLD%"
           fi
-      
+
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage/lcov.info
           retention-days: 30
-      
+
       - name: Upload coverage HTML report
         uses: actions/upload-artifact@v4
         with:
