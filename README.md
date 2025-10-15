@@ -1,256 +1,345 @@
+# JIntent
 
-# jintent
+[![Pub Version](https://img.shields.io/pub/v/jintent.svg)](https://pub.dev/packages/jintent)
+![License](https://img.shields.io/github/license/GenSoftMX/JIntent)
+![Pub Points](https://img.shields.io/badge/pub%20points-160/160-informational)
+![Likes](https://img.shields.io/pub/likes/jintent)
+<!-- ![Build](https://img.shields.io/github/actions/workflow/status/GenSoftMX/JIntent/ci.yml?branch=main) -->
+<!-- ![Coverage](https://img.shields.io/badge/coverage-XX%25-yellow) -->
 
-`jintent` is a Flutter package that provides an architecture for managing state changes in your application using the concept of intents. This architecture promotes a structured and modular approach to handling specific actions or events, allowing for a clean separation of concerns.
+> Lightweight, explicit Intent + State + Side Effect architecture for Flutter (MVI-inspired)  
 
-I created this library because I had difficulty organizing complex projects for a long time, I was not able to completely decouple the different events within the application, through this library we clearly manage the different events and states of the application.
+## Table of Contents
+- Overview
+- Why JIntent?
+- Quick Start
+- Core Concepts
+- Architecture
+- Minimal Example
+- Side Effects
+- Concurrency & Ordering
+- Testing
+- Comparison
+- Migration (if any)
+- Roadmap (Short Term)
+- Contributing
+- License
 
-## Features
+## Overview
+JIntent provides a simple, explicit way to:
+1. Represent immutable UI state (JState).
+2. Trigger domain actions via Intents (JIntent subclasses).
+3. Update state in a single, predictable point (JController).
+4. Emit one-off side effects (navigation, dialogs, toasts) without polluting state (JEffect / side effect channels).
 
-- **Intent Handling:** Introduce the concept of intents, encapsulating actions that can modify the state of your Flutter application.
-- **State Management:** `JController` class for managing states and emitting updates.
-- **Dependency Injection:** Leverages GetIt for efficient dependency injection.
-- **Common Functionalities:** `JCommonsMixin` provides convenient access to common functionalities in Flutter.
-- **ProgressDialogManager:** `JProgressDialogManagerController` for showing and hiding progress dialogs.
+Goal: Clarity and testability with minimal boilerplate.
 
-## Getting Started
+## Why JIntent?
+| Problem in typical apps | How JIntent helps |
+|-------------------------|-------------------|
+| Mixed UI + logic        | Controller centralizes state transitions |
+| Side effects duplicated | Dedicated side effect stream/channel |
+| Hard to test flows      | Intents are discrete, testable units |
+| Race conditions         | (Document your chosen intent handling policy) |
+| State mutation          | Immutability via copyWith patterns |
 
-To get started with `jintent`, follow these steps:
-
-1. Add the `jintent` package to your `pubspec.yaml` file:
-
-   ```yaml
-   dependencies:
-     jintent: ^1.0.1
-   ```
-
-   Replace `^1.0.1` with the latest version.
-
-2. Import the package in your Dart code:
-
-   ```dart
-   import 'package:jintent/jintent.dart';
-   ```
-
-3. Implement the `JController` and `JIntent` classes to manage state changes in your application.
-
-4. Leverage the common functionalities provided by `JCommonsMixin` in your Flutter widgets.
-
-5. For showing and hiding progress dialogs, use `JProgressDialogManagerController`.
-
-## Example
-
-Here's a simple example demonstrating how to use:
-
-
-Full example:
-
-* `AuthenticationState`
-* `AuthenticationController`
-* `AuthenticationIntent`
-* Y un uso típico en UI con `emitSideEffect`, `setState`, y `intent`.
-
----
-
-### 📦 1. `AuthenticationState`
-
-```dart
-import 'package:jintent/jstate.dart';
-
-class AuthenticationState extends JState {
-  final String email;
-  final String password;
-  final bool isLoading;
-
-  AuthenticationState({
-    this.email = '',
-    this.password = ''
-  });
-
-  AuthenticationState copyWith({
-    String? email,
-    String? password,
-    bool? isLoading,
-  }) {
-    return AuthenticationState(
-      email: email ?? this.email,
-      password: password ?? this.password,
-      isLoading: isLoading ?? this.isLoading,
-    );
-  }
-
-  @override
-  List<Object?> get props => [email, password, isLoading];
-}
+## Quick Start
+Add dependency:
+```yaml
+dependencies:
+  jintent: ^X.Y.Z
 ```
-
----
-
-### ⚙️ 2. `AuthenticationController`
-
-```dart
-import 'package:jintent/jcontroller.dart';
-import 'authentication_state.dart';
-import 'authentication_intent.dart';
-
-class AuthenticationController extends JController<AuthenticationState> {
-  AuthenticationController() : super(AuthenticationState());
-
-  @override
-  void onInit() {
-    super.onInit();
-    // You could load saved credentials or something else here.
-  }
-}
-```
-
----
-
-### 🚀 3. `AuthenticationIntent`
-
+Import:
 ```dart
 import 'package:jintent/jintent.dart';
-import 'authentication_state.dart';
-import 'authentication_controller.dart';
-import 'package:jintent/jeffect.dart';
+```
 
-class SubmitLoginIntent extends JIntent<AuthenticationState> {
-  final String email;
-  final String password;
+Create State:
+```dart
 
-  SubmitLoginIntent({
-    required this.email,
-    required this.password,
-  });
+@immutable
+class CounterState extends JState {
+  final int counter;
+
+  const CounterState({required this.counter});
 
   @override
-  Future<void> invoke(JController<AuthenticationState> controller) async {
-    final c = controller as AuthenticationController;
+  CounterState copyWith({int? newStateCounter}) =>
+      CounterState(counter: newStateCounter ?? counter);
 
-    // Set loading state
-    c.setState(c.currentState.copyWith(isLoading: true));
+  @override
+  List<Object?> get props => [counter];
 
-    await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+  factory CounterState.initialState() => const CounterState(counter: 0);
+}
 
-    if (email == 'admin@test.com' && password == '123456') {
-      // Emit a navigation or success effect
-      c.emitSideEffect(SuccessLoginEffect());
-    } else {
-      c.emitSideEffect(
-        ShowErrorDialogEffect(message: 'Invalid credentials'),
-      );
+```
+
+Declare Intents:
+```dart
+class DecrementUseCase extends JSyncUseCase<int, int> {
+  @override
+  Either<Exception, int> run(int currentValue) {
+    final newValue = currentValue - 1;
+
+    if (newValue < -10) {
+      return Left(Exception('Value cannot be less than -10'));
     }
-
-    // Remove loading
-    c.setState(c.currentState.copyWith(isLoading: false));
+    return Right(newValue);
   }
 }
 ```
 
----
-
-### 💥 4. `SideEffects`
-
+Controller:
 ```dart
-class ShowErrorDialogEffect extends JEffect<void> {
-  final String message;
-  ShowErrorDialogEffect({required this.message});
+class CounterController extends JController<CounterState> {
+  // With injection dependence
+  final _getCurrentCounterValueIntent = Di.sl<GetCurrentCounterValueIntent>();
+  final _incrementIntent = Di.sl<IncrementIntent>();
+  final _decrementIntent = Di.sl<DecrementIntent>();
+
+  // other common to Creation
+  // final _getCurrentCounterValueIntent = GetCurrentCounterValueIntent()
+  // final _incrementIntent = IncrementIntent();
+  // final _decrementIntent = DecrementIntent();
+
+  CounterController(super.initialState);
+
+  void loadCounter() {
+    intent(_getCurrentCounterValueIntent);
+  }
+
+  void increment() => intent(_incrementIntent);
+
+  void decrement() => intent(_decrementIntent);
+
+  @override
+  void onInit() {}
 }
 
-class SuccessLoginEffect extends JEffect<void> {}
 ```
 
----
-
-### 🧩 5. UI Handler Example (Flutter)
-
+UI:
 ```dart
-void setupEffectHandler(
-  AuthenticationController controller,
-  BuildContext context,
-) {
-  final handler = JSideEffectHandler<AuthenticationState>(controller, context);
 
-  handler.register<ShowErrorDialogEffect>((effect, _) async {
-    await showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Login Failed'),
-        content: Text(effect.message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              effect.complete(null);
-            },
-            child: const Text('OK'),
+import 'package:counter/src/presentation/counter/controllers/controller.dart';
+import 'package:counter/src/presentation/counter/presentation/counter_effect_handler.dart';
+import 'package:counter/src/presentation/counter/states/state.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jintent/jintent.dart';
+
+class CounterView extends ConsumerStatefulWidget {
+  const CounterView({super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _CounterViewState();
+}
+
+class _CounterViewState extends ConsumerState<CounterView> {
+  final throttler = JThrottler(const Duration(milliseconds: 200));
+
+  late final CounterController _counterController;
+
+  JSideEffectHandler<CounterState> get _sideEffectHandler =>
+      CounterEffectHandler(_counterController);
+
+  @override
+  void initState() {
+    super.initState();
+
+    _counterController = ref.read(couterControllerProvider.notifier);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final counter = ref.watch(
+      couterControllerProvider.select((value) => value.counter),
+    );
+
+    return JEffectListener(
+      controller: _counterController,
+      handler: _sideEffectHandler,
+      child: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text('You have pushed the button this many times:'),
+              Text(
+                '$counter',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ],
           ),
-        ],
+        ),
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton.extended(
+              label: const Text('Increment'),
+              heroTag: 'Increment',
+              onPressed: () => throttler.call(_counterController.increment),
+              tooltip: 'Increment',
+              icon: const Icon(Icons.exposure_plus_1_outlined),
+            ),
+            const SizedBox(height: 10),
+            FloatingActionButton.extended(
+              label: const Text('Decrement'),
+              heroTag: 'Decrement',
+              onPressed: () => throttler.call(_counterController.decrement),
+              tooltip: 'Decrement',
+              icon: const Icon(Icons.exposure_minus_1_sharp),
+            ),
+          ],
+        ),
       ),
     );
-  });
-
-  handler.register<SuccessLoginEffect>((effect, _) async {
-    Navigator.of(context).pushReplacementNamed('/home');
-    effect.complete(null);
-  });
-
-  controller.sideEffects.listen((e) => handler.handle(e, controller));
+  }
 }
+
 ```
 
----
+## Core Concepts
+- JState: Immutable snapshot of UI data.
+- JIntent: User or system intention (e.g., SubmitLogin, LoadItems).
+- JController<S, I>: Receives intents, updates state, emits side effects.
+- Side Effect: One-shot event (navigation, toast, analytics).
+- Effect Channel / Stream: Decoupled delivery of ephemeral events.
 
-### 🧪 6. Ejemplo en UI (`onPressed` o similar)
+## Architecture
+Flow (simplified):
+User Action -> Intent -> Controller.handle -> (New State) + (Optional Side Effect)
 
+State updates propagate to UI via a ValueListenable/Stream.
+Side effects consumed once by a listener (e.g. using a StreamBuilder or dedicated hook).
+
+
+### ⚡ Side Effects (Modern Overview)
+
+Side effects (JEffect) model transient events (navigation, dialogs, toasts) outside of state.  
+Key types:
+- JEffect<T> (base, can return a value or fail)
+- JFireAndForgetEffect (no return value)
+- JResultEffect<T> / JDialogEffect<T> (explicit return value)
+
+Quick example:
 ```dart
-final controller = AuthenticationController();
-
-// Somewhere in your button:
-onPressed: () {
-  controller.intent(
-    SubmitLoginIntent(email: 'admin@test.com', password: '123456'),
-  );
+final confirmed = await controller.emitAndWaitSideEffect(
+  DeleteDialogEffect(itemName: 'File.txt'),
+);
+if (confirmed) {
+  controller.intent(DeleteItemIntent(...));
 }
 ```
 
----
+If an awaited effect has no handler, the default strategy completes it silently (warnAndAutoComplete).  
+Configure a different strategy with:
+```dart
+JEffectsConfig().unhandledStrategy = UnhandledEffectStrategy.throwError;
+```
 
-¿Te gustaría que también te genere esto como una mini app de ejemplo o que lo exporte a archivos organizados para copiar y pegar?
+## Concurrency & Ordering
+
+JIntent processes intents in a predictable, sequential order by default.  
+- **Queue (FIFO):** Intents are enqueued and handled one at a time, ensuring state transitions are applied in the order they were received.
+- **No Parallel Mutations:** This avoids race conditions and makes state changes easy to reason about.
+- **Custom Policies:** Advanced users can implement custom intent handling strategies (e.g., debouncing, throttling, dropping, or merging intents) by extending the controller or using middleware.
+
+**Best practice:**  
+Document your chosen concurrency policy in your controller, especially if you change the default behavior. This helps maintain clarity and prevents subtle bugs in complex flows.
 
 
-## Documentation
+## Testing
+Recommended strategy:
+1. Given initial state
+2. When: dispatch intent
+3. Await completion
+4. Assert new state + captured side effects
 
-![My Image](assets/jintent.svg)
 
-## Contributing
+## Comparison (High Level)
+| Feature | JIntent | Bloc | Redux | Plain Riverpod |
+|---------|---------|------|-------|----------------|
+| Side effects channel | Yes | Yes (via Bloc) | Middleware needed | Provider-dependent |
+| Boilerplate | Low | Medium | High | Low |
+| Immutable state | Yes | Yes | Yes | Depends |
+| Intent semantics | Explicit classes | Events | Actions | Method calls |
+| Concurrency control | (Document) | Per event loop | Middleware | Custom |
 
-Not allow by the moment(working on a big feature)
+## Migration
+If upgrading from 1.x to 2.x:
+- Update import paths.
+- Adjust side effect API rename.
+- See CHANGELOG for removed symbols.
+(Provide MIGRATION.md if many items.)
 
-## Author
+## Roadmap (Short Term)
+- [✓] Formal concurrency policy documentation
+- [✓] Logging observer utility
+- [ ] Advanced examples (debounce, pagination, streaming)
+- [ ] DevTool overlay (visualize intents/states)
+- [ ] Undo/Redo experiment
 
-- [Jesus Donaldo Sanchez Inzunza](https://www.linkedin.com/in/jdsanchez94/)
+# Contributing Guidelines
+
+Thank you for your interest in contributing to this project.  
+This document sets the official policies and guidelines for collaboration.  
+
+## 1. Communication
+- Before starting any development, please **open an issue** to discuss the proposal.  
+- All contributions must align with the project's vision, objectives, and standards.  
+
+## 2. Git Workflow
+- Use branch names with the following format:
+  - `feature/<short-description>`
+  - `fix/<short-description>`
+  - `chore/<short-description>`
+- Example: `feature/offline-sync`
+
+- Commit messages must follow the **Conventional Commits** standard:
+  - `feat`: New feature
+  - `fix`: Bug fix
+  - `docs`: Documentation
+  - `refactor`: Internal refactor, no functional change
+  - `test`: Adding or updating tests
+
+## 3. Code Quality
+- Every change must include:
+  - **Unit and/or integration tests**.
+  - An entry in **CHANGELOG.md** under `[Unreleased]`.
+  - Compliance with the project’s **linting and formatting** rules.
+
+## 4. Pull Requests
+- PRs must be clear, concise, and focused only on related changes.  
+- The PR description should include:
+  - The problem it solves.
+  - The changes introduced.
+  - Instructions for testing.  
+- At least one reviewer must approve the PR, and all automated checks must pass.  
+
+## 5. Versioning and Releases
+- We follow **Semantic Versioning (SemVer)**:
+  - **MAJOR**: Breaking changes.
+  - **MINOR**: Backward-compatible new features.
+  - **PATCH**: Bug fixes.
+- All releases must be documented in **CHANGELOG.md**.  
+
+## 6. Code of Conduct
+All interactions must follow the [Code of Conduct](./CODE_OF_CONDUCT.md), fostering a professional, inclusive, and respectful environment.  
+
 
 ## License
+MIT © 2025 TodoFlutter.com  
 
-MIT License
+## FAQ
+Q: How do I avoid duplicate side effects after Hot Reload?  
+A: Keep effects listener registration inside initState and cancel in dispose; do not re-emit past effects (channel is one-shot).
 
-Copyright (c) 2020 Remi Rousselet
+Q: Can I dispatch intents from inside another intent?  
+A: Prefer composing functions or scheduling a new intent after current finishes to maintain linear flow.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Q: Does JIntent support cancellation?  
+A: (Document if implemented; show API or mark as planned.)

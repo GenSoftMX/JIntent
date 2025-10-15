@@ -1,6 +1,6 @@
 name: jintent
 description: "jintent is a Flutter package that provides an architecture for managing state changes in your application using the concept of intents."
-version: 2.0.1
+version: 2.1.0
 homepage: https://github.com/GenSoftMX/JIntent
 environment:
   sdk: ^3.7.2

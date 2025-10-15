@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:jintent/src/core/dispachers/sequential_intent_dispatcher.dart';
 import 'package:jintent/src/core/effects/jeffect.dart';
+import 'package:jintent/src/core/effects/jeffect_config.dart';
 import 'package:jintent/src/core/jintent.dart';
 import 'package:jintent/src/devtools/jobserver.dart';
 import 'package:jintent/src/core/jstate.dart';
@@ -46,7 +48,7 @@ abstract class JController<T extends JState> extends StateNotifier<T> {
   ///
   /// Automatically calls [onInit] after construction.
   JController(T initialState, {JIntentDispatcher? dispatcher})
-    : _dispatcher = dispatcher ?? JDefaultIntentDispatcher(),
+    : _dispatcher = dispatcher ?? JSequentialIntentDispatcher(),
       super(initialState) {
     onInit();
   }
@@ -116,17 +118,35 @@ abstract class JController<T extends JState> extends StateNotifier<T> {
     JObserver.notifyEffectEmitted(effect);
   }
 
-  /// Emits a side effect and waits for the result.
-  ///
-  /// Used when a response from the UI is required, such as confirming an action.
-  ///
-  /// The UI must complete the effect using `effect.complete(value)`.
-  Future<V> emitAndWaitSideEffect<V>(JEffect<V> effect) {
+  /// Emits a [JEffect] and waits for its completion or timeout.
+  Future<V> emitAndWaitSideEffect<V>(JEffect<V> effect, {Duration? timeout}) {
+    // Emit the effect
     emitSideEffect(effect);
-    JObserver.notifyEffectEmitted(effect);
-    return effect.result;
+
+    // Apply timeout if configured
+    final appliedTimeout = timeout ?? JEffectsConfig().defaultTimeout;
+
+    // If no timeout is set, return the effect's result immediately
+    if (appliedTimeout == null) return effect.result;
+
+    // Apply timeout logic
+    return effect.result.timeout(
+      appliedTimeout,
+      onTimeout: () {
+        if (!effect.isCompleted) {
+          effect.completeError(
+            TimeoutException(
+              'Effect ${effect.runtimeType} (id=${effect.id}) timed out after $appliedTimeout',
+            ),
+          );
+        }
+        // Will throw on await due to error completion
+        return Future.value(null) as V;
+      },
+    );
   }
 
+  /// Disposes the controller and closes the side effects stream.
   @override
   void dispose() {
     _sideEffectController.close();
