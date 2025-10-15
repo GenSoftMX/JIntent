@@ -1225,18 +1225,34 @@ class CreateUserUseCase extends JUseCase<CreateUserInput, User> {
 
 ### 11.1 Related Documentation
 
-- [ADR-005: Security Architecture](./adr/ADR-005-security-architecture.md)
-- [ADR-006: Error Handling Patterns](./adr/ADR-006-error-handling-patterns.md)
-- [ADR-007: Validation Framework](./adr/ADR-007-validation-framework.md)
-- [Error Handling Guide](./ERROR_HANDLING_GUIDE.md)
-- [API Versioning Guide](./API_VERSIONING.md)
+**JIntent Guides:**
+- [Error Handling Guide](./ERROR_HANDLING_GUIDE.md) - Error patterns and Either monad usage
+- [API Versioning Guide](./API_VERSIONING.md) - Semantic versioning and breaking changes
+- [Validation Examples](./examples/validation_examples.md) - Practical validation patterns
+- [Error Handling Examples](./examples/error_handling_examples.md) - Error handling code examples
+
+**Architecture Decision Records:**
+- [ADR-005: Security Architecture](./adr/ADR-005-security-architecture.md) - Security framework decisions
+- [ADR-006: Error Handling Patterns](./adr/ADR-006-error-handling-patterns.md) - Error strategy decisions
+- [ADR-007: Validation Framework](./adr/ADR-007-validation-framework.md) - Validation approach
+
+**Project Documentation:**
+- [Documentation Index](./README.md) - Complete documentation navigation
+- [Exception Inventory](./EXCEPTION_INVENTORY.md) - Exception governance and patterns
+- [Repository Analysis](./REPOSITORY_ANALYSIS.md) - Security baseline and analysis
 
 ### 11.2 External Resources
 
-- [OWASP ASVS 4.0](https://owasp.org/www-project-application-security-verification-standard/)
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [Dart Security Best Practices](https://dart.dev/guides/language/effective-dart/usage#do-follow-security-best-practices)
-- [Flutter Security](https://docs.flutter.dev/deployment/obfuscate)
+- [OWASP ASVS 4.0](https://owasp.org/www-project-application-security-verification-standard/) - Application Security Verification Standard
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/) - Top security risks
+- [Dart Security Best Practices](https://dart.dev/guides/language/effective-dart/usage#do-follow-security-best-practices) - Dart security guidelines
+- [Flutter Security](https://docs.flutter.dev/deployment/obfuscate) - Flutter deployment security
+
+### 11.3 Community & Support
+
+- [GitHub Issues](https://github.com/GenSoftMX/JIntent/issues) - Report bugs or request features
+- [GitHub Discussions](https://github.com/GenSoftMX/JIntent/discussions) - Ask questions and share ideas
+- [Security Advisories](https://github.com/GenSoftMX/JIntent/security/advisories) - Report vulnerabilities privately
 
 ---
 
@@ -1244,3 +1260,10 @@ class CreateUserUseCase extends JUseCase<CreateUserInput, User> {
 **Last Updated:** 2025-10-15  
 **Next Review:** 2025-11-15  
 **Maintained By:** JIntent Core Team
+
+---
+
+**Quick Links:**
+- [← Back to Documentation Index](./README.md)
+- [Error Handling Guide →](./ERROR_HANDLING_GUIDE.md)
+- [Main README](../README.md)

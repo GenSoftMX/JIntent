@@ -1124,17 +1124,36 @@ void main() {
 
 ### 10.1 Related Documentation
 
-- [Security Guide](./SECURITY_GUIDE.md) - Error security considerations
-- [ADR-006: Error Handling Patterns](./adr/ADR-006-error-handling-patterns.md)
-- [Validation Framework](./adr/ADR-007-validation-framework.md)
-- [Exception Inventory](./EXCEPTION_INVENTORY.md)
+**JIntent Guides:**
+- [Security Guide](./SECURITY_GUIDE.md) - Error security considerations and logging
+- [API Versioning Guide](./API_VERSIONING.md) - Error handling in version migrations
+- [Validation Examples](./examples/validation_examples.md) - Input validation patterns
+- [Error Handling Examples](./examples/error_handling_examples.md) - Practical error handling code
+
+**Architecture Decision Records:**
+- [ADR-006: Error Handling Patterns](./adr/ADR-006-error-handling-patterns.md) - Error strategy decisions
+- [ADR-007: Validation Framework](./adr/ADR-007-validation-framework.md) - Validation approach
+- [ADR-005: Security Architecture](./adr/ADR-005-security-architecture.md) - Security error handling
+
+**Project Documentation:**
+- [Documentation Index](./README.md) - Complete documentation navigation
+- [Exception Inventory](./EXCEPTION_INVENTORY.md) - Exception governance and catalog
 
 ### 10.2 Code Examples
 
-See the example app for complete implementations:
+**Example Application:**
 - `example/lib/src/domain/use_cases/` - Use case error handling
 - `example/lib/src/presentation/intents/` - Intent error handling
 - `example/lib/src/data/repositories/` - Repository error handling
+
+**Example Documentation:**
+- [Error Handling Examples](./examples/error_handling_examples.md) - Comprehensive code samples
+- [Validation Examples](./examples/validation_examples.md) - Input validation patterns
+
+### 10.3 Community & Support
+
+- [GitHub Issues](https://github.com/GenSoftMX/JIntent/issues) - Report bugs or request features
+- [GitHub Discussions](https://github.com/GenSoftMX/JIntent/discussions) - Ask questions and share ideas
 
 ---
 
@@ -1142,3 +1161,11 @@ See the example app for complete implementations:
 **Last Updated:** 2025-10-15  
 **Next Review:** 2025-11-15  
 **Maintained By:** JIntent Core Team
+
+---
+
+**Quick Links:**
+- [← Back to Documentation Index](./README.md)
+- [← Security Guide](./SECURITY_GUIDE.md)
+- [API Versioning Guide →](./API_VERSIONING.md)
+- [Main README](../README.md)

@@ -800,16 +800,33 @@ If unsure whether a change is breaking:
 
 ### 11.1 Related Documentation
 
-- [ADR-001: API Design and Versioning](./adr/ADR-001-api-design-and-versioning.md)
-- [Contributing Guidelines](../README.md#contributing-guidelines)
-- [CHANGELOG.md](../CHANGELOG.md)
+**JIntent Guides:**
+- [Security Guide](./SECURITY_GUIDE.md) - Security considerations for API changes
+- [Error Handling Guide](./ERROR_HANDLING_GUIDE.md) - Error handling patterns
+- [Validation Examples](./examples/validation_examples.md) - Input validation patterns
+- [Error Handling Examples](./examples/error_handling_examples.md) - Error handling code examples
+
+**Architecture Decision Records:**
+- [ADR-001: API Design and Versioning](./adr/ADR-001-api-design-and-versioning.md) - API versioning decisions
+- [ADR-006: Error Handling Patterns](./adr/ADR-006-error-handling-patterns.md) - Error strategy
+- [ADR-004: Documentation Standards](./adr/ADR-004-documentation-standards.md) - Documentation guidelines
+
+**Project Documentation:**
+- [Documentation Index](./README.md) - Complete documentation navigation
+- [CHANGELOG.md](../CHANGELOG.md) - Version history
+- [Contributing Guidelines](../README.md#contributing-guidelines) - Contribution process
 
 ### 11.2 External Resources
 
-- [Semantic Versioning 2.0.0](https://semver.org/)
-- [Keep a Changelog](https://keepachangelog.com/)
-- [Dart Package Versioning](https://dart.dev/tools/pub/versioning)
-- [Pub.dev Publishing](https://dart.dev/tools/pub/publishing)
+- [Semantic Versioning 2.0.0](https://semver.org/) - SemVer specification
+- [Keep a Changelog](https://keepachangelog.com/) - Changelog best practices
+- [Dart Package Versioning](https://dart.dev/tools/pub/versioning) - Dart-specific versioning
+- [Pub.dev Publishing](https://dart.dev/tools/pub/publishing) - Package publishing guide
+
+### 11.3 Community & Support
+
+- [GitHub Issues](https://github.com/GenSoftMX/JIntent/issues) - Report bugs or request features
+- [GitHub Discussions](https://github.com/GenSoftMX/JIntent/discussions) - Ask questions and share ideas
 
 ---
 
@@ -817,3 +834,11 @@ If unsure whether a change is breaking:
 **Last Updated:** 2025-10-15  
 **Next Review:** 2025-11-15  
 **Maintained By:** JIntent Core Team
+
+---
+
+**Quick Links:**
+- [← Back to Documentation Index](./README.md)
+- [← Error Handling Guide](./ERROR_HANDLING_GUIDE.md)
+- [Security Guide](./SECURITY_GUIDE.md)
+- [Main README](../README.md)
