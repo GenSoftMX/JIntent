@@ -1,0 +1,114 @@
+{
+  "timestamp": "2025-10-15T02:23:58.163Z",
+  "commit_reference": "86700cb",
+  "project": {
+    "name": "JIntent",
+    "version": "2.1.0",
+    "repository": "https://github.com/GenSoftMX/JIntent"
+  },
+  "languages": {
+    "primary": "Dart",
+    "percentage_breakdown": {
+      "Dart": "~95%",
+      "CMake": "~3%",
+      "Other": "~2%"
+    }
+  },
+  "codebase": {
+    "total_dart_files": 58,
+    "lib_dart_files": 29,
+    "test_dart_files": 9,
+    "example_dart_files": 19,
+    "total_lib_lines": 1567,
+    "total_test_lines": 485,
+    "lines_per_file_avg": 54
+  },
+  "testing": {
+    "unit_tests": 9,
+    "integration_tests": 0,
+    "e2e_tests": 0,
+    "test_coverage_percentage": "UNKNOWN",
+    "test_frameworks": ["flutter_test", "test", "mockito", "mocktail"]
+  },
+  "dependencies": {
+    "production": {
+      "equatable": "^2.0.5",
+      "flutter": "sdk",
+      "state_notifier": "^1.0.0"
+    },
+    "development": {
+      "flutter_test": "sdk",
+      "test": "^1.21.0",
+      "mockito": "^5.4.0",
+      "mocktail": "^1.0.4",
+      "build_runner": "^2.4.7",
+      "flutter_lints": "^2.0.0"
+    },
+    "total_direct_dependencies": 3,
+    "total_dev_dependencies": 6
+  },
+  "vulnerabilities": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "total": 0,
+    "scan_status": "NOT_PERFORMED",
+    "note": "No vulnerability scanning performed during Phase 0"
+  },
+  "quality": {
+    "linting": {
+      "enabled": true,
+      "framework": "flutter_lints",
+      "version": "^2.0.0",
+      "error_count": "UNKNOWN"
+    },
+    "static_analysis": {
+      "tool": "dart analyze",
+      "status": "NOT_RUN"
+    }
+  },
+  "architecture": {
+    "pattern": "MVI (Model-View-Intent)",
+    "layers": ["presentation", "domain", "core"],
+    "modules": 7,
+    "key_components": ["JController", "JIntent", "JState", "JEffect"]
+  },
+  "security": {
+    "compliance_framework": "OWASP ASVS L2",
+    "baseline_compliance_percentage": 0,
+    "target_compliance_percentage": 95,
+    "assessed_controls": 0,
+    "met_controls": 0,
+    "partial_controls": 0,
+    "missing_controls": 0,
+    "scan_status": "PENDING"
+  },
+  "error_handling": {
+    "exception_types": ["Exception", "TimeoutException"],
+    "error_code_count": 0,
+    "error_inventory_status": "DOCUMENTED",
+    "note": "Uses Dart/Flutter standard exceptions; no custom error code system"
+  },
+  "ci_cd": {
+    "platform": "NONE",
+    "configured": false,
+    "pipelines": 0,
+    "note": "No CI/CD configuration found in repository"
+  },
+  "observability": {
+    "logging": {
+      "framework": "Custom (JLoggingObserver)",
+      "structured": false,
+      "correlation_ids": false
+    },
+    "metrics": {
+      "enabled": false,
+      "framework": "NONE"
+    },
+    "tracing": {
+      "enabled": false,
+      "framework": "NONE"
+    }
+  }
+}
