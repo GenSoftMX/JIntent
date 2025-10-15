@@ -1,5 +1,15 @@
 ## [Unreleased]
 ### Documentation
+- **Validation Guide**: Added comprehensive `docs/VALIDATION_GUIDE.md` covering UseCaseInputValidator patterns, fail-fast validation chains, and best practices
+- **Example Validators**: Added reusable validator examples in `example/lib/src/domain/validators/`:
+  - Common validators (string, numeric, collection validation)
+  - Email validators (format, length, domain validation)
+  - Password validators (security requirements, complexity checks)
+  - Counter validators (range checks, increment/decrement validation)
+- **Example Use Cases**: Added validated use case examples demonstrating fail-fast validation:
+  - `ValidatedIncrementUseCase` - Counter increment with validation
+  - `ValidatedDecrementUseCase` - Counter decrement with validation
+  - `ValidateUserRegistrationUseCase` - Complex multi-field validation
 - **Data Layer Guide**: Added comprehensive `docs/DATA_LAYER_GUIDE.md` covering repository patterns, mappers, Either-based error handling, and validation pipelines
 - **Mapper Tests**: Added `test/src/domain/mapper_test.dart` demonstrating ArgumentError handling and recovery patterns
 - **Example Repository**: Added complete repository example in `example/lib/src/data/` showing:
