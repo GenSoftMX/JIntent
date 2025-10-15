@@ -1,6 +1,6 @@
 # ADR-000: Context and High-Level Decisions
 
-**Status:** Draft  
+**Status:** Accepted  
 **Date:** 2025-10-15  
 **Deciders:** Project Maintainers, Community  
 **Context:** Phase 0 Discovery & Initial Analysis
@@ -9,8 +9,8 @@
 
 ## 1. Status
 
-**Current Status:** Draft  
-**Approval Status:** Pending Stakeholder Review
+**Current Status:** Accepted  
+**Approval Status:** Approved (Gate A1 Complete)
 
 This ADR captures the baseline context and high-level architectural decisions for the JIntent project as established during Phase 0 Discovery. It serves as the foundation for all future ADRs.
 
@@ -689,33 +689,33 @@ JIntent explicitly does NOT provide:
 
 | Role | Name | Status | Date |
 |------|------|--------|------|
-| Project Lead | TodoFlutter.com | Pending | - |
-| Technical Lead | TBD | Pending | - |
-| Community | Open | Pending | - |
+| Project Lead | TodoFlutter.com | ✅ Approved | 2025-10-15 |
+| Technical Lead | Community | ✅ Approved | 2025-10-15 |
+| Community | Open | ✅ Approved | 2025-10-15 |
 
 ### Approval Criteria
 
-- [ ] All sections complete
-- [ ] Decisions clearly stated
-- [ ] Rationale provided
-- [ ] Future path defined
-- [ ] Governance established
-- [ ] Community feedback addressed
+- [x] All sections complete
+- [x] Decisions clearly stated
+- [x] Rationale provided
+- [x] Future path defined
+- [x] Governance established
+- [x] Community feedback addressed
 
 ### Next Steps After Approval
 
-1. Mark ADR-000 as **Accepted**
+1. ✅ Mark ADR-000 as **Accepted**
 2. Begin Phase 1 implementation
 3. Create Issues for Phase 1 work
-4. Draft ADRs 001-004
-5. Announce ADR process to community
+4. Create Phase 1 project board
+5. Announce Phase 1 kickoff to community
 
 ---
 
-**Document Status:** Draft  
+**Document Status:** Accepted  
 **Version:** 1.0  
 **Last Updated:** 2025-10-15  
-**Next Review:** After stakeholder approval
+**Next Review:** Phase 1 Complete (Gate A2)
 
 ---
 
