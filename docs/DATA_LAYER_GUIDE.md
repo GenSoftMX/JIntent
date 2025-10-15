@@ -1119,10 +1119,12 @@ See the example application in `example/lib/src/data/` for a complete implementa
 
 ### Key Files
 
-- `example/lib/src/data/repositories/user_repository.dart` - Repository implementation
-- `example/lib/src/data/mappers/user_mapper.dart` - Mapper examples
-- `example/lib/src/domain/use_cases/get_user_use_case.dart` - Use case with validation
-- `test/src/domain/mapper_test.dart` - Mapper tests with ArgumentError examples
+- `example/lib/src/data/repositories/counter_repository.dart` - Repository implementations
+- `example/lib/src/data/mappers/counter_mapper.dart` - Mapper examples (JMapper and IBiMapper)
+- `example/lib/src/data/models/` - DTO and Entity models
+- `test/src/domain/mapper_test.dart` - Core mapper tests with ArgumentError examples
+- `example/test/src/data/mappers/counter_mapper_test.dart` - Example mapper tests
+- `example/test/src/data/repositories/counter_repository_test.dart` - Repository tests
 
 ---
 
