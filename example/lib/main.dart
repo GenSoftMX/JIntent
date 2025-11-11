@@ -13,9 +13,14 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  enableLoggingObserver();
-
   await Di().init();
+
+  ///   // Enable metrics collection
+  JMetrics.enable();
+
+  ///
+  ///   // Optionally attach to JObserver for automatic metrics
+  JMetrics.attachToObserver();
 
   runApp(const ProviderScope(child: MyApp()));
 }
