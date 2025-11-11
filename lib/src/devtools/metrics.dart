@@ -189,7 +189,7 @@ class JMetrics {
       );
 
       // Start timing intent execution
-      final timerId = startTimer(
+      startTimer(
         'intent.execution',
         tags: {'type': intent.runtimeType.toString()},
       );

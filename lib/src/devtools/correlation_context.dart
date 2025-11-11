@@ -24,7 +24,6 @@ import 'dart:async';
 /// logger.info('Processing login', context: {'correlationId': id});
 /// ```
 class CorrelationContext {
-  static final Zone _rootZone = Zone.current;
   static const _correlationIdKey = #correlationId;
   static int _counter = 0;
 

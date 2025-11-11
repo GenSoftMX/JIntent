@@ -139,7 +139,7 @@ class _JDevToolsOverlayState extends State<JDevToolsOverlay> {
       right: 16,
       child: FloatingActionButton(
         mini: true,
-        backgroundColor: Colors.deepPurple.withOpacity(0.9),
+        backgroundColor: Colors.deepPurple.withValues(alpha: 0.9),
         onPressed: () {
           setState(() {
             _isVisible = !_isVisible;
@@ -162,7 +162,7 @@ class _JDevToolsOverlayState extends State<JDevToolsOverlay> {
       child: Material(
         elevation: 8,
         borderRadius: BorderRadius.circular(12),
-        color: Colors.black.withOpacity(0.95),
+        color: Colors.black.withValues(alpha: 0.95),
         child: Column(
           children: [_buildHeader(context), Expanded(child: _buildEventList())],
         ),
@@ -237,7 +237,7 @@ class _JDevToolsOverlayState extends State<JDevToolsOverlay> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.3),
+        color: color.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: color, width: 1),
       ),
@@ -312,7 +312,7 @@ class _JDevToolsOverlayState extends State<JDevToolsOverlay> {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -328,7 +328,7 @@ class _JDevToolsOverlayState extends State<JDevToolsOverlay> {
           if (event.metadata.isNotEmpty)
             Container(
               padding: const EdgeInsets.all(12),
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
