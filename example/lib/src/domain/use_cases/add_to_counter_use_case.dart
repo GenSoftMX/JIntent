@@ -69,7 +69,9 @@ class AddToCounterUseCase extends JSyncUseCase<AddToCounterInput, int> {
   ) {
     if (input.amountToAdd < 0) {
       return Left(
-        Exception('Amount to add cannot be negative, got: ${input.amountToAdd}'),
+        Exception(
+          'Amount to add cannot be negative, got: ${input.amountToAdd}',
+        ),
       );
     }
     return Right(input);

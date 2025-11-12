@@ -8,7 +8,9 @@ import 'package:jintent/jintent.dart';
 class JEffectsLogger {
   static void logEmitted(JEffect effect) {
     if (!kDebugMode) return;
-    debugPrint('[Effect][emit] id=${effect.id} type=${effect.runtimeType} category=${effect.resolvedCategory}');
+    debugPrint(
+      '[Effect][emit] id=${effect.id} type=${effect.runtimeType} category=${effect.resolvedCategory}',
+    );
   }
 
   static void logCompleted(JEffect effect) {

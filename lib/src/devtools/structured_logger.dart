@@ -30,7 +30,7 @@ enum LogLevel {
 ///     minLevel: LogLevel.info,
 ///     serviceName: 'my-app',
 ///   );
-///   
+///
 ///   logger.info('User logged in', context: {
 ///     'userId': '12345',
 ///     'correlationId': 'abc-123',
@@ -101,7 +101,7 @@ class JStructuredLogger {
     }
 
     final jsonOutput = jsonEncode(logEntry);
-    
+
     if (kDebugMode) {
       debugPrint(jsonOutput);
     }
@@ -123,11 +123,7 @@ class JStructuredLogger {
   }
 
   /// Logs a warning-level message.
-  void warn(
-    String message, {
-    Map<String, dynamic>? context,
-    Object? error,
-  }) {
+  void warn(String message, {Map<String, dynamic>? context, Object? error}) {
     log(LogLevel.warn, message, context: context, error: error);
   }
 
@@ -156,10 +152,7 @@ class JStructuredLogger {
       minLevel: minLevel,
       serviceName: serviceName,
       version: version,
-      defaultContext: {
-        ...defaultContext,
-        ...additionalContext,
-      },
+      defaultContext: {...defaultContext, ...additionalContext},
     );
   }
 }

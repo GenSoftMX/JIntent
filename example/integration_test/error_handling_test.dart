@@ -13,7 +13,9 @@ void main() {
       await Di().init();
     });
 
-    testWidgets('displays error when exceeding maximum boundary', (tester) async {
+    testWidgets('displays error when exceeding maximum boundary', (
+      tester,
+    ) async {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
@@ -38,7 +40,9 @@ void main() {
       // - Error message text
     });
 
-    testWidgets('displays error when exceeding minimum boundary', (tester) async {
+    testWidgets('displays error when exceeding minimum boundary', (
+      tester,
+    ) async {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
@@ -87,7 +91,7 @@ void main() {
       await tester.tap(incrementButton);
       await tester.tap(decrementButton);
       await tester.tap(incrementButton);
-      
+
       await tester.pumpAndSettle();
 
       // Final result should be +1
@@ -119,7 +123,9 @@ void main() {
       expect(find.text('9'), findsOneWidget);
     });
 
-    testWidgets('maintains state consistency during error conditions', (tester) async {
+    testWidgets('maintains state consistency during error conditions', (
+      tester,
+    ) async {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
@@ -127,7 +133,7 @@ void main() {
       final decrementButton = find.byIcon(Icons.remove);
 
       // Complex scenario with multiple error conditions
-      
+
       // Go to max
       for (int i = 0; i < 10; i++) {
         await tester.tap(incrementButton);
@@ -140,7 +146,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(incrementButton);
       await tester.pumpAndSettle();
-      
+
       // Should still be at max
       expect(find.text('10'), findsOneWidget);
 
@@ -156,7 +162,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(decrementButton);
       await tester.pumpAndSettle();
-      
+
       // Should still be at min
       expect(find.text('-10'), findsOneWidget);
 
@@ -165,7 +171,7 @@ void main() {
         await tester.tap(incrementButton);
         await tester.pumpAndSettle();
       }
-      
+
       // Should be at -5
       expect(find.text('-5'), findsOneWidget);
     });
@@ -190,7 +196,7 @@ void main() {
       // Should be able to perform operations
       await tester.tap(decrementButton);
       await tester.pumpAndSettle();
-      
+
       expect(find.text('9'), findsOneWidget);
     });
   });

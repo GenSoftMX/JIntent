@@ -3,10 +3,7 @@ class CounterDto {
   final int value;
   final String? lastUpdated;
 
-  CounterDto({
-    required this.value,
-    this.lastUpdated,
-  });
+  CounterDto({required this.value, this.lastUpdated});
 
   /// Create DTO from JSON
   factory CounterDto.fromJson(Map<String, dynamic> json) {
@@ -18,10 +15,7 @@ class CounterDto {
 
   /// Convert DTO to JSON
   Map<String, dynamic> toJson() {
-    return {
-      'value': value,
-      'lastUpdated': lastUpdated,
-    };
+    return {'value': value, 'lastUpdated': lastUpdated};
   }
 
   @override

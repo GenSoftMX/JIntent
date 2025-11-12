@@ -10,7 +10,8 @@ class JEffectsConfig {
   Duration? defaultTimeout;
 
   /// Strategy when an awaitable effect has no handler.
-  UnhandledEffectStrategy unhandledStrategy = UnhandledEffectStrategy.warnAndAutoComplete;
+  UnhandledEffectStrategy unhandledStrategy =
+      UnhandledEffectStrategy.warnAndAutoComplete;
 
   /// Generates effect IDs; override for custom formats.
   String Function()? idGenerator;
@@ -23,8 +24,4 @@ class JEffectsConfig {
 /// - `warnOnly`: Log a warning but do not complete the effect.
 /// - `warnAndAutoComplete`: Log a warning and auto-complete the effect with null.
 /// - `throwError`: Log a warning and throw an error for unhandled awaitable effects.
-enum UnhandledEffectStrategy {
-  warnOnly,
-  warnAndAutoComplete,
-  throwError,
-}
+enum UnhandledEffectStrategy { warnOnly, warnAndAutoComplete, throwError }

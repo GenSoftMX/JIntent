@@ -7,11 +7,12 @@ import 'package:jintent/src/core/effects/jeffect_config.dart';
 /// Handler for a specific effect [E] with state [S].
 /// Returns a Future that completes when the UI has finished processing the effect.
 /// Note: DO NOT retain BuildContext after a prolonged await.
-typedef EffectHandler<E extends JEffect, S extends JState> = Future<void> Function(
-  E effect,
-  JController<S> controller,
-  BuildContext context,
-);
+typedef EffectHandler<E extends JEffect, S extends JState> =
+    Future<void> Function(
+      E effect,
+      JController<S> controller,
+      BuildContext context,
+    );
 
 /// Marker for effects that can expose a UI category (analytics/devtools).
 mixin JCategorizableEffect {
@@ -30,12 +31,13 @@ abstract class JEffect<T> {
   final Completer<T> _completer = Completer<T>();
 
   JEffect()
-      : id = (JEffectsConfig().idGenerator?.call()) ?? _defaultId(),
-        createdAt = DateTime.now();
+    : id = (JEffectsConfig().idGenerator?.call()) ?? _defaultId(),
+      createdAt = DateTime.now();
 
   static String _defaultId() =>
       'eff_${DateTime.now().microsecondsSinceEpoch}_${_randSuffix()}';
-  static String _randSuffix() => (DateTime.now().millisecondsSinceEpoch % 997).toRadixString(16);
+  static String _randSuffix() =>
+      (DateTime.now().millisecondsSinceEpoch % 997).toRadixString(16);
 
   /// Future that completes when the effect is handled (or failed).
   Future<T> get result => _completer.future;
@@ -62,7 +64,8 @@ abstract class JEffect<T> {
   }
 
   @override
-  String toString() => 'JEffect(id=$id,type=$runtimeType,completed=$isCompleted)';
+  String toString() =>
+      'JEffect(id=$id,type=$runtimeType,completed=$isCompleted)';
 }
 
 /// Effect that is semánticamente "fire and forget" (no valor útil).

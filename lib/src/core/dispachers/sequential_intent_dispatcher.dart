@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:jintent/jintent.dart';
 
-
 /// Dispatcher for handling intents sequentially, ensuring that each intent
 /// is processed one at a time in the order they are received.
 class JSequentialIntentDispatcher implements JIntentDispatcher {
@@ -34,7 +33,9 @@ class JSequentialIntentDispatcher implements JIntentDispatcher {
         final task = _queue.removeFirst();
         try {
           if (kDebugMode) {
-            debugPrint('🚀 [JIntent][SEQ] Dispatching ${task.intent.runtimeType}');
+            debugPrint(
+              '🚀 [JIntent][SEQ] Dispatching ${task.intent.runtimeType}',
+            );
           }
 
           await task.intent.run(task.controller);
@@ -47,7 +48,9 @@ class JSequentialIntentDispatcher implements JIntentDispatcher {
           task.completer.complete();
         } catch (e, st) {
           if (kDebugMode) {
-            debugPrint('❌ [JIntent][SEQ] Error in ${task.intent.runtimeType}: $e');
+            debugPrint(
+              '❌ [JIntent][SEQ] Error in ${task.intent.runtimeType}: $e',
+            );
           }
           // Notify the observer (you could add an onIntentError hook if you want)
           task.completer.completeError(e, st);

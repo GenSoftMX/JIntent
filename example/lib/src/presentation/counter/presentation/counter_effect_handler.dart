@@ -138,30 +138,31 @@ class CounterEffectHandler extends JSideEffectHandler<CounterState> {
   ) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.error_outline, color: Colors.red),
-            const SizedBox(width: 8),
-            Expanded(child: Text(effect.title)),
-          ],
-        ),
-        content: Text(effect.message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('CANCEL'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+      builder:
+          (context) => AlertDialog(
+            title: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.red),
+                const SizedBox(width: 8),
+                Expanded(child: Text(effect.title)),
+              ],
             ),
-            child: Text(effect.actionLabel ?? 'OK'),
+            content: Text(effect.message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('CANCEL'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(effect.actionLabel ?? 'OK'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
     effect.complete(result ?? false);
   }
@@ -169,10 +170,10 @@ class CounterEffectHandler extends JSideEffectHandler<CounterState> {
 
 /// Error severity levels for consistent UX
 enum ErrorSeverity {
-  info,      // Informational messages (blue)
-  warning,   // Warning messages (orange)
-  error,     // Error messages (red)
-  critical,  // Critical errors requiring dialog
+  info, // Informational messages (blue)
+  warning, // Warning messages (orange)
+  error, // Error messages (red)
+  critical, // Critical errors requiring dialog
 }
 
 // ============================================================================
@@ -220,7 +221,8 @@ class ShowInfoEffect extends JFireAndForgetEffect with JCategorizableEffect {
 }
 
 /// Critical error dialog effect - shows dialog for important errors
-class ShowErrorDialogEffect extends JDialogEffect<bool> with JCategorizableEffect {
+class ShowErrorDialogEffect extends JDialogEffect<bool>
+    with JCategorizableEffect {
   final String title;
   final String message;
   final String? actionLabel;

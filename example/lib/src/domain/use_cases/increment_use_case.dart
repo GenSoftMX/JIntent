@@ -7,7 +7,7 @@ import 'package:jintent/jintent.dart';
 ///
 /// Validation:
 /// - On every second call, validates that input is not at maximum (10)
-/// 
+///
 /// Business Logic:
 /// - Increments the value by 1
 /// - Ensures result doesn't exceed maximum value of 10

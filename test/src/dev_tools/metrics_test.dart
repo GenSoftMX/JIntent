@@ -35,22 +35,22 @@ void main() {
     test('starts disabled by default', () {
       JMetrics.disable();
       JMetrics.clear();
-      
+
       JMetrics.incrementCounter('test');
-      
+
       expect(JMetrics.getMetrics().length, 0);
     });
 
     test('enable allows metric collection', () {
       JMetrics.enable();
       JMetrics.incrementCounter('test');
-      
+
       expect(JMetrics.getMetrics().length, 1);
     });
 
     test('incrementCounter records counter metric', () {
       JMetrics.incrementCounter('test.counter');
-      
+
       final metrics = JMetrics.getMetrics();
       expect(metrics.length, 1);
       expect(metrics[0].name, 'test.counter');
@@ -62,7 +62,7 @@ void main() {
       JMetrics.incrementCounter('test');
       JMetrics.incrementCounter('test');
       JMetrics.incrementCounter('test');
-      
+
       final metrics = JMetrics.getMetrics();
       expect(metrics.length, 3);
       expect(metrics[0].value, 1);
@@ -72,7 +72,7 @@ void main() {
 
     test('recordGauge records gauge metric', () {
       JMetrics.recordGauge('memory.usage', 1024);
-      
+
       final metrics = JMetrics.getMetrics();
       expect(metrics.length, 1);
       expect(metrics[0].name, 'memory.usage');
@@ -84,7 +84,7 @@ void main() {
       final timerId = JMetrics.startTimer('operation');
       await Future.delayed(const Duration(milliseconds: 10));
       JMetrics.stopTimer(timerId);
-      
+
       final metrics = JMetrics.getMetrics();
       expect(metrics.length, 1);
       expect(metrics[0].name, 'operation.duration');
@@ -95,7 +95,7 @@ void main() {
 
     test('recordHistogram records histogram metric', () {
       JMetrics.recordHistogram('response.size', 512);
-      
+
       final metrics = JMetrics.getMetrics();
       expect(metrics.length, 1);
       expect(metrics[0].name, 'response.size');
@@ -104,11 +104,11 @@ void main() {
     });
 
     test('metrics include tags', () {
-      JMetrics.incrementCounter('http.requests', tags: {
-        'method': 'GET',
-        'status': '200',
-      });
-      
+      JMetrics.incrementCounter(
+        'http.requests',
+        tags: {'method': 'GET', 'status': '200'},
+      );
+
       final metrics = JMetrics.getMetrics();
       expect(metrics[0].tags['method'], 'GET');
       expect(metrics[0].tags['status'], '200');
@@ -118,7 +118,7 @@ void main() {
       JMetrics.incrementCounter('metric1');
       JMetrics.incrementCounter('metric2');
       JMetrics.incrementCounter('metric1');
-      
+
       final filtered = JMetrics.getMetricsByName('metric1');
       expect(filtered.length, 2);
       expect(filtered.every((m) => m.name == 'metric1'), true);
@@ -128,7 +128,7 @@ void main() {
       JMetrics.incrementCounter('counter1');
       JMetrics.recordGauge('gauge1', 100);
       JMetrics.incrementCounter('counter2');
-      
+
       final counters = JMetrics.getMetricsByType(MetricType.counter);
       expect(counters.length, 2);
       expect(counters.every((m) => m.type == MetricType.counter), true);
@@ -138,7 +138,7 @@ void main() {
       JMetrics.incrementCounter('test1');
       JMetrics.incrementCounter('test2');
       expect(JMetrics.getMetrics().length, 2);
-      
+
       JMetrics.clear();
       expect(JMetrics.getMetrics().length, 0);
     });
@@ -146,7 +146,7 @@ void main() {
     test('getSummary returns metric summary', () {
       JMetrics.incrementCounter('counter1');
       JMetrics.recordGauge('gauge1', 100);
-      
+
       final summary = JMetrics.getSummary();
       expect(summary['enabled'], true);
       expect(summary['totalMetrics'], 2);
@@ -161,7 +161,7 @@ void main() {
         value: 42,
         tags: {'tag1': 'value1'},
       );
-      
+
       final json = metric.toJson();
       expect(json['name'], 'test');
       expect(json['type'], 'counter');
@@ -173,10 +173,10 @@ void main() {
     group('attachToObserver', () {
       test('tracks intent dispatches', () {
         JMetrics.attachToObserver();
-        
+
         final intent = FakeIntent();
         JObserver.notifyIntentDispatched(intent);
-        
+
         final metrics = JMetrics.getMetricsByName('intent.dispatched');
         expect(metrics.length, 1);
         expect(metrics[0].tags['type'], 'FakeIntent');
@@ -184,12 +184,12 @@ void main() {
 
       test('tracks state changes', () {
         JMetrics.attachToObserver();
-        
+
         final prev = FakeState();
         final next = FakeState();
         final intent = FakeIntent();
         JObserver.notifyStateChanged(prev, next, intent);
-        
+
         final metrics = JMetrics.getMetricsByName('state.changed');
         expect(metrics.length, 1);
         expect(metrics[0].tags['stateType'], 'FakeState');
@@ -198,10 +198,10 @@ void main() {
 
       test('tracks effect emissions', () {
         JMetrics.attachToObserver();
-        
+
         final effect = FakeEffect();
         JObserver.notifyEffectEmitted(effect);
-        
+
         final metrics = JMetrics.getMetricsByName('effect.emitted');
         expect(metrics.length, 1);
         expect(metrics[0].tags['type'], 'FakeEffect');
@@ -211,17 +211,17 @@ void main() {
         bool originalIntentCalled = false;
         bool originalStateCalled = false;
         bool originalEffectCalled = false;
-        
+
         JObserver.onIntentDispatched = (_) => originalIntentCalled = true;
         JObserver.onStateChanged = (_, __, ___) => originalStateCalled = true;
         JObserver.onEffectEmitted = (_) => originalEffectCalled = true;
-        
+
         JMetrics.attachToObserver();
-        
+
         JObserver.notifyIntentDispatched(FakeIntent());
         JObserver.notifyStateChanged(FakeState(), FakeState(), null);
         JObserver.notifyEffectEmitted(FakeEffect());
-        
+
         expect(originalIntentCalled, true);
         expect(originalStateCalled, true);
         expect(originalEffectCalled, true);

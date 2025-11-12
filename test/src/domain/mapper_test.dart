@@ -7,11 +7,7 @@ class UserEntity {
   final String fullName;
   final String email;
 
-  UserEntity({
-    required this.id,
-    required this.fullName,
-    required this.email,
-  });
+  UserEntity({required this.id, required this.fullName, required this.email});
 }
 
 class UserDto {
@@ -19,22 +15,14 @@ class UserDto {
   final String name;
   final String email;
 
-  UserDto({
-    required this.id,
-    required this.name,
-    required this.email,
-  });
+  UserDto({required this.id, required this.name, required this.email});
 }
 
 // Test mapper implementation
 class UserMapper extends JMapper<UserEntity, UserDto> {
   @override
   UserDto map(UserEntity entity) {
-    return UserDto(
-      id: entity.id,
-      name: entity.fullName,
-      email: entity.email,
-    );
+    return UserDto(id: entity.id, name: entity.fullName, email: entity.email);
   }
 }
 
@@ -42,11 +30,7 @@ class UserMapper extends JMapper<UserEntity, UserDto> {
 class UserBiMapper implements IBiMapper<UserEntity, UserDto> {
   @override
   UserDto to(UserEntity input) {
-    return UserDto(
-      id: input.id,
-      name: input.fullName,
-      email: input.email,
-    );
+    return UserDto(id: input.id, name: input.fullName, email: input.email);
   }
 
   @override
@@ -124,12 +108,15 @@ void main() {
       expect(result[1].id, 2);
     });
 
-    test('transformDynamic should throw ArgumentError for unsupported type', () {
-      expect(
-        () => mapper.transformDynamic('invalid string'),
-        throwsA(isA<ArgumentError>()),
-      );
-    });
+    test(
+      'transformDynamic should throw ArgumentError for unsupported type',
+      () {
+        expect(
+          () => mapper.transformDynamic('invalid string'),
+          throwsA(isA<ArgumentError>()),
+        );
+      },
+    );
 
     test('transformDynamic should throw ArgumentError for null', () {
       expect(
@@ -139,10 +126,7 @@ void main() {
     });
 
     test('transformDynamic should throw ArgumentError for wrong type', () {
-      expect(
-        () => mapper.transformDynamic(123),
-        throwsA(isA<ArgumentError>()),
-      );
+      expect(() => mapper.transformDynamic(123), throwsA(isA<ArgumentError>()));
     });
 
     test('transformDynamic ArgumentError can be caught and recovered', () {
@@ -155,11 +139,7 @@ void main() {
       } on ArgumentError catch (e) {
         errorMessage = e.message?.toString();
         // Recovery: provide default value
-        result = UserDto(
-          id: -1,
-          name: 'Unknown',
-          email: 'unknown@example.com',
-        );
+        result = UserDto(id: -1, name: 'Unknown', email: 'unknown@example.com');
       }
 
       expect(errorMessage, 'Unsupported type');
@@ -218,11 +198,7 @@ void main() {
     });
 
     test('from should map from DTO back to entity', () {
-      final dto = UserDto(
-        id: 1,
-        name: 'John Doe',
-        email: 'john@example.com',
-      );
+      final dto = UserDto(id: 1, name: 'John Doe', email: 'john@example.com');
 
       final entity = biMapper.from(dto);
 

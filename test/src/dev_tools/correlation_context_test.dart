@@ -13,7 +13,7 @@ void main() {
 
     test('runWithCorrelation provides correlation ID', () async {
       String? capturedId;
-      
+
       await CorrelationContext.runWithCorrelation(() async {
         capturedId = CorrelationContext.current;
       });
@@ -25,13 +25,10 @@ void main() {
     test('runWithCorrelation uses provided correlation ID', () async {
       const testId = 'test-correlation-id';
       String? capturedId;
-      
-      await CorrelationContext.runWithCorrelation(
-        () async {
-          capturedId = CorrelationContext.current;
-        },
-        correlationId: testId,
-      );
+
+      await CorrelationContext.runWithCorrelation(() async {
+        capturedId = CorrelationContext.current;
+      }, correlationId: testId);
 
       expect(capturedId, testId);
     });
@@ -39,12 +36,12 @@ void main() {
     test('correlation ID is accessible in nested async calls', () async {
       String? outerCapturedId;
       String? innerCapturedId;
-      
+
       await CorrelationContext.runWithCorrelation(() async {
         outerCapturedId = CorrelationContext.current;
-        
+
         await Future.delayed(Duration.zero);
-        
+
         innerCapturedId = CorrelationContext.current;
       });
 
@@ -55,10 +52,10 @@ void main() {
     test('nested correlations maintain their own IDs', () async {
       String? outer;
       String? inner;
-      
+
       await CorrelationContext.runWithCorrelation(() async {
         outer = CorrelationContext.current;
-        
+
         await CorrelationContext.runWithCorrelation(() async {
           inner = CorrelationContext.current;
         });
@@ -71,7 +68,7 @@ void main() {
 
     test('runSyncWithCorrelation provides correlation ID', () {
       String? capturedId;
-      
+
       CorrelationContext.runSyncWithCorrelation(() {
         capturedId = CorrelationContext.current;
       });
@@ -82,13 +79,10 @@ void main() {
     test('runSyncWithCorrelation uses provided correlation ID', () {
       const testId = 'sync-test-id';
       String? capturedId;
-      
-      CorrelationContext.runSyncWithCorrelation(
-        () {
-          capturedId = CorrelationContext.current;
-        },
-        correlationId: testId,
-      );
+
+      CorrelationContext.runSyncWithCorrelation(() {
+        capturedId = CorrelationContext.current;
+      }, correlationId: testId);
 
       expect(capturedId, testId);
     });
@@ -99,7 +93,7 @@ void main() {
 
     test('asContext returns map with correlation ID', () async {
       Map<String, String>? capturedContext;
-      
+
       await CorrelationContext.runWithCorrelation(() async {
         capturedContext = CorrelationContext.asContext;
       });
@@ -111,11 +105,11 @@ void main() {
     test('generated IDs are unique', () async {
       String? id1;
       String? id2;
-      
+
       await CorrelationContext.runWithCorrelation(() async {
         id1 = CorrelationContext.current;
       });
-      
+
       await CorrelationContext.runWithCorrelation(() async {
         id2 = CorrelationContext.current;
       });
@@ -127,13 +121,13 @@ void main() {
       String? id1;
       String? id2;
       String? id3;
-      
+
       await CorrelationContext.runWithCorrelation(() async {
         id1 = CorrelationContext.current;
-        
+
         await Future.delayed(const Duration(milliseconds: 10));
         id2 = CorrelationContext.current;
-        
+
         await Future.delayed(const Duration(milliseconds: 10));
         id3 = CorrelationContext.current;
       });
@@ -161,7 +155,7 @@ void main() {
 
     test('correlation ID contains timestamp and counter', () async {
       String? id;
-      
+
       await CorrelationContext.runWithCorrelation(() async {
         id = CorrelationContext.current;
       });

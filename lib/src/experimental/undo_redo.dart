@@ -33,7 +33,7 @@ import 'package:jintent/jintent.dart';
 mixin UndoRedoMixin<T extends JState> on JController<T> {
   final List<T> _undoStack = [];
   final List<T> _redoStack = [];
-  
+
   int _maxHistorySize = 50;
   bool _undoRedoEnabled = false;
   bool _isUndoRedoOperation = false;
@@ -76,7 +76,7 @@ mixin UndoRedoMixin<T extends JState> on JController<T> {
 
     // Save current state to undo stack
     _undoStack.add(currentState);
-    
+
     // Limit history size
     if (_undoStack.length > _maxHistorySize) {
       _undoStack.removeAt(0);
@@ -157,7 +157,6 @@ mixin UndoRedoMixin<T extends JState> on JController<T> {
 /// ```
 abstract class UndoableIntent<T extends JState> extends JIntent<T>
     with JIntentHelpers<T> {
-  
   /// Performs an undoable state update.
   ///
   /// This will add the current state to the undo history before applying
@@ -181,7 +180,7 @@ abstract class UndoableIntent<T extends JState> extends JIntent<T>
 /// ```dart
 /// class IncrementCommand extends UndoableCommand<CounterState> {
 ///   final int amount;
-///   
+///
 ///   IncrementCommand(this.amount);
 ///
 ///   @override
@@ -231,33 +230,33 @@ class CommandHistory<T extends JState> {
   /// Executes a command and adds it to history.
   T execute(T currentState, UndoableCommand<T> command) {
     _undoStack.add(command);
-    
+
     if (_undoStack.length > maxSize) {
       _undoStack.removeAt(0);
     }
-    
+
     _redoStack.clear();
-    
+
     return command.execute(currentState);
   }
 
   /// Undoes the last command.
   T? undo(T currentState) {
     if (!canUndo) return null;
-    
+
     final command = _undoStack.removeLast();
     _redoStack.add(command);
-    
+
     return command.undo(currentState);
   }
 
   /// Redoes the last undone command.
   T? redo(T currentState) {
     if (!canRedo) return null;
-    
+
     final command = _redoStack.removeLast();
     _undoStack.add(command);
-    
+
     return command.redo(currentState);
   }
 

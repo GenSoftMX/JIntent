@@ -3,10 +3,7 @@ class CounterEntity {
   final int value;
   final DateTime lastUpdated;
 
-  CounterEntity({
-    required this.value,
-    required this.lastUpdated,
-  });
+  CounterEntity({required this.value, required this.lastUpdated});
 
   @override
   String toString() =>

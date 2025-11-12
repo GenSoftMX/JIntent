@@ -28,7 +28,7 @@ void main() {
 
       expect(capturedLogs.length, 1);
       final logEntry = jsonDecode(capturedLogs[0]) as Map<String, dynamic>;
-      
+
       expect(logEntry['level'], 'INFO');
       expect(logEntry['message'], 'Test message');
       expect(logEntry['timestamp'], isNotNull);
@@ -36,7 +36,7 @@ void main() {
 
     test('respects minimum log level', () {
       final logger = JStructuredLogger(minLevel: LogLevel.warn);
-      
+
       logger.debug('Debug message');
       logger.info('Info message');
       logger.warn('Warn message');
@@ -60,10 +60,7 @@ void main() {
 
     test('includes custom context', () {
       final logger = JStructuredLogger();
-      logger.info('Test', context: {
-        'userId': '12345',
-        'action': 'login',
-      });
+      logger.info('Test', context: {'userId': '12345', 'action': 'login'});
 
       final logEntry = jsonDecode(capturedLogs[0]) as Map<String, dynamic>;
       expect(logEntry['context']['userId'], '12345');
@@ -74,7 +71,7 @@ void main() {
       final logger = JStructuredLogger();
       final error = Exception('Test error');
       final stackTrace = StackTrace.current;
-      
+
       logger.error('Error occurred', error: error, stackTrace: stackTrace);
 
       final logEntry = jsonDecode(capturedLogs[0]) as Map<String, dynamic>;
@@ -86,7 +83,7 @@ void main() {
       final logger = JStructuredLogger(
         defaultContext: {'env': 'test', 'region': 'us-east'},
       );
-      
+
       logger.info('Test', context: {'userId': '12345'});
 
       final logEntry = jsonDecode(capturedLogs[0]) as Map<String, dynamic>;
@@ -96,11 +93,11 @@ void main() {
     });
 
     test('withContext creates child logger with additional context', () {
-      final parentLogger = JStructuredLogger(
-        defaultContext: {'env': 'test'},
-      );
-      
-      final childLogger = parentLogger.withContext({'correlationId': 'abc-123'});
+      final parentLogger = JStructuredLogger(defaultContext: {'env': 'test'});
+
+      final childLogger = parentLogger.withContext({
+        'correlationId': 'abc-123',
+      });
       childLogger.info('Test');
 
       final logEntry = jsonDecode(capturedLogs[0]) as Map<String, dynamic>;
@@ -110,7 +107,7 @@ void main() {
 
     test('all log level methods work correctly', () {
       final logger = JStructuredLogger(minLevel: LogLevel.trace);
-      
+
       logger.trace('Trace message');
       logger.debug('Debug message');
       logger.info('Info message');
@@ -118,11 +115,12 @@ void main() {
       logger.error('Error message');
 
       expect(capturedLogs.length, 5);
-      
-      final levels = capturedLogs.map((log) {
-        final entry = jsonDecode(log) as Map<String, dynamic>;
-        return entry['level'];
-      }).toList();
+
+      final levels =
+          capturedLogs.map((log) {
+            final entry = jsonDecode(log) as Map<String, dynamic>;
+            return entry['level'];
+          }).toList();
 
       expect(levels, ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR']);
     });
@@ -133,7 +131,7 @@ void main() {
         serviceName: 'parent-service',
         version: '1.0.0',
       );
-      
+
       final child = parent.withContext({'requestId': 'req-123'});
       child.debug('Should not log');
       child.info('Should log');

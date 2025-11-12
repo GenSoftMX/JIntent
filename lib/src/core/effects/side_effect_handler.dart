@@ -6,11 +6,12 @@ import 'package:jintent/src/core/effects/jeffect_config.dart';
 /// Type alias for internal handler function signature.
 /// This is used to map effects to their handlers.
 /// It takes an effect, a controller, and a BuildContext, and returns a Future.
-typedef _InternalHandler = Future<void> Function(
-  JEffect effect,
-  JController controller,
-  BuildContext context,
-);
+typedef _InternalHandler =
+    Future<void> Function(
+      JEffect effect,
+      JController controller,
+      BuildContext context,
+    );
 
 /// Base class for handling side effects in a [JController].
 /// Enhanced to support:
@@ -38,7 +39,9 @@ abstract class JSideEffectHandler<T extends JState> {
     if (handler != null) {
       await handler(effect, controller, context);
 
-      if (kDebugMode && !effect.isCompleted && effect is! JFireAndForgetEffect) {
+      if (kDebugMode &&
+          !effect.isCompleted &&
+          effect is! JFireAndForgetEffect) {
         debugPrint(
           '⚠️ [JEffect] Effect "${effect.runtimeType}" completed handler path WITHOUT completing result.\n'
           'If this effect is awaited, caller will hang. Call effect.complete(value) or effect.completeError().',
@@ -88,16 +91,15 @@ abstract class JSideEffectHandler<T extends JState> {
 
     if (strategy == UnhandledEffectStrategy.throwError && isAwaitable) {
       effect.completeError(
-        StateError(
-          'No handler registered for ${effect.runtimeType}',
-        ),
+        StateError('No handler registered for ${effect.runtimeType}'),
       );
       throw StateError(
         '[JEffect] No handler registered for ${effect.runtimeType}',
       );
     }
 
-    if (strategy == UnhandledEffectStrategy.warnAndAutoComplete && isAwaitable) {
+    if (strategy == UnhandledEffectStrategy.warnAndAutoComplete &&
+        isAwaitable) {
       if (kDebugMode) {
         debugPrint(
           '⚠️ [JEffect] Unhandled awaitable effect ${effect.runtimeType} → auto-completing with null.',
@@ -110,9 +112,7 @@ abstract class JSideEffectHandler<T extends JState> {
 
     if (strategy == UnhandledEffectStrategy.warnOnly) {
       if (kDebugMode) {
-        debugPrint(
-          '⚠️ [JEffect] Unhandled effect ${effect.runtimeType}',
-        );
+        debugPrint('⚠️ [JEffect] Unhandled effect ${effect.runtimeType}');
       }
     }
   }

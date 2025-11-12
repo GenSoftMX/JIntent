@@ -2,18 +2,18 @@ import 'package:jintent/jintent.dart';
 import 'observability_setup.dart';
 
 /// Mixin that adds observability features to intents.
-/// 
+///
 /// Provides easy access to logging and metrics within intents.
-/// 
+///
 /// Example:
 /// ```dart
-/// class MyIntent extends JIntent<MyState> 
+/// class MyIntent extends JIntent<MyState>
 ///     with JIntentHelpers, ObservableIntentMixin {
 ///   @override
 ///   Future<void> onInvoke() async {
 ///     logInfo('Intent started');
 ///     trackMetric('operation.count');
-///     
+///
 ///     try {
 ///       await performOperation();
 ///       logInfo('Intent completed');
@@ -29,17 +29,15 @@ mixin ObservableIntentMixin<T extends JState> on JIntent<T> {
   JStructuredLogger get logger {
     final baseLogger = ObservabilitySetup.logger;
     final correlationContext = CorrelationContext.asContext;
-    
+
     if (correlationContext != null) {
       return baseLogger.withContext({
         ...correlationContext,
         'intentType': runtimeType.toString(),
       });
     }
-    
-    return baseLogger.withContext({
-      'intentType': runtimeType.toString(),
-    });
+
+    return baseLogger.withContext({'intentType': runtimeType.toString()});
   }
 
   /// Logs an info-level message.
@@ -78,7 +76,7 @@ mixin ObservableIntentMixin<T extends JState> on JIntent<T> {
   }
 
   /// Starts a timer for measuring operation duration.
-  /// 
+  ///
   /// Returns a timer ID that should be passed to [stopTimer].
   String startTimer(String name, {Map<String, String>? tags}) {
     return JMetrics.startTimer(name, tags: tags);
@@ -90,7 +88,7 @@ mixin ObservableIntentMixin<T extends JState> on JIntent<T> {
   }
 
   /// Wraps intent execution with automatic timing and logging.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// @override
@@ -107,28 +105,24 @@ mixin ObservableIntentMixin<T extends JState> on JIntent<T> {
   }) async {
     final name = operationName ?? runtimeType.toString();
     final timerId = startTimer('$name.duration');
-    
+
     logDebug('$name started');
-    
+
     try {
       await operation();
       stopTimer(timerId, tags: {'status': 'success'});
       logDebug('$name completed successfully');
     } catch (e, stackTrace) {
       stopTimer(timerId, tags: {'status': 'error'});
-      logError(
-        '$name failed',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      logError('$name failed', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
 
   /// Wraps intent execution with correlation context, timing, and logging.
-  /// 
+  ///
   /// This is the recommended way to execute observable intents.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// @override
