@@ -1,0 +1,20 @@
+{
+  "name": "jintent-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync-docs": "node scripts/sync-docs.mjs",
+    "check-translations": "node scripts/check-translations.mjs",
+    "dev": "npm run sync-docs && astro dev",
+    "build": "npm run check-translations && npm run sync-docs && astro build",
+    "preview": "astro preview",
+    "check-links": "node scripts/check-links.mjs"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "0.42.6",
+    "astro": "7.4.0",
+    "astro-mermaid": "2.1.0",
+    "mermaid": "11.12.0",
+    "sharp": "0.35.5"
+  }
+}

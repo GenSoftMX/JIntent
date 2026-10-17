@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.astro/
+
+# Generated from ../README.md, ../doc and translations/ by scripts/sync-docs.mjs.
+src/content/docs/getting-started.md
+src/content/docs/guides/
+src/content/docs/adr/
+src/content/docs/es/getting-started.md
+src/content/docs/es/guides/
+src/content/docs/es/adr/
+
+# Built by scripts/build-demo.sh.
+public/demo/
+src/content/docs/adr.md
+src/content/docs/es/adr.md

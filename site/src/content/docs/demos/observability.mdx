@@ -1,0 +1,33 @@
+---
+title: Observability Lab
+description: Metrics, correlation ids, observers and the debug overlay.
+---
+
+import DemoFrame from '../../../components/DemoFrame.astro';
+
+Every button runs an intent through a droppable dispatcher while several observers watch at the same time: `JMetrics`, a custom observer that fills the event log, and the debug overlay.
+
+<DemoFrame route="/demos/observability" title="Observability Lab demo" height={640} />
+
+## Try it
+
+1. Press **Succeed** and watch the counters and the event log. The log shows the intent starting and finishing, and the state change attributed to that intent.
+2. Press **Fail**. The intent throws, and the failure is observed through `onIntentFailed`.
+3. Press **Cancel**. The intent cancels itself and is reported as cancelled instead of dispatched.
+4. Press **Drop one**. It fires two intents back to back; the droppable dispatcher discards the second and `onIntentDropped` fires.
+5. Open the debug overlay (bottom-right button) to see the same events inside the app.
+
+## Registering an observer
+
+```dart
+class AnalyticsObserver extends JObserverDelegate {
+  @override
+  void onIntentFailed(JIntent intent, Object error, StackTrace stackTrace) {
+    report(intent.runtimeType, error, stackTrace);
+  }
+}
+
+final remove = JObserver.addObserver(AnalyticsObserver());
+```
+
+Observers compose, and one that throws never affects the code it observes. See the [observability guide](/JIntent/guides/observability/) for metrics, correlation and extension points.

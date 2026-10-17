@@ -1,0 +1,32 @@
+---
+title: Undo notes
+description: Stable undo and redo with an observable history.
+---
+
+import DemoFrame from '../../../components/DemoFrame.astro';
+
+A small notes editor whose changes are recorded with `UndoRedoMixin`. History is metadata that the UI listens to separately from the notes themselves.
+
+<DemoFrame route="/demos/undo" title="Undo notes demo" height={600} />
+
+## Try it
+
+1. Type a note in the field and press the **+** button. Add a few.
+2. Use the undo and redo arrows and watch the notes disappear and come back. The buttons enable and disable themselves from the history, not from the notes.
+3. Press **Remove last**, then the undo arrow to bring the note back.
+4. Press **Clear history**. The notes stay, but the undo and redo arrows turn off, because clearing history changes metadata, not the document.
+5. After undoing, add a new note: the redo branch is dropped, as in any editor.
+
+## The wiring
+
+```dart
+class NotesController extends JController<NotesState>
+    with UndoRedoMixin<NotesState> {
+  NotesController() : super(const NotesState());
+
+  @override
+  void onInit() => enableUndoRedo(maxHistorySize: 20);
+}
+```
+
+Undo and redo restore snapshots of local state. They do not reverse a request, a database write or a dialog. Read the [undo and redo guide](/JIntent/guides/undo-redo/) for ordering, capacity and the command-based alternative.
