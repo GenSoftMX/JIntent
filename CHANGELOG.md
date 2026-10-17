@@ -1,3 +1,10 @@
+## [3.0.1] - 2026-10-16
+
+### Documentation
+- The README states the 3.0.0 requirements, summarizes what is new and links the
+  interactive guide; the guides no longer describe 3.0.0 as unreleased.
+- `pubspec.yaml` declares `repository` and `issue_tracker`.
+
 ## [3.0.0] - 2026-10-16
 
 Upgrading from 2.2.0: read the [migration guide](doc/migration.md). Requires
