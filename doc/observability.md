@@ -68,6 +68,14 @@ and effect completion are not measured. Attaching twice has no extra effect and
 `getSummary` to inspect them. `JMetrics.maxMetrics` (default 1000) bounds
 retained measurements by dropping the oldest.
 
+Intent, effect and state names in logs, metric tags (`type`, `stateType`,
+`originIntent`), overlay titles and error messages come from
+`runtimeType.toString()`. Builds that minify or obfuscate names (Flutter web
+`--release`, or `--obfuscate` on mobile) report short generated names such as
+`minified:dY` instead. Counters and behavior are unaffected; only the labels
+change. Web `--profile` builds keep the names, which is why the interactive
+guide builds its demo that way.
+
 ## Debug overlay
 
 `JDevToolsOverlay` displays recent intent, state and effect notifications inside
