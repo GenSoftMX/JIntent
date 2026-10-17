@@ -72,6 +72,7 @@ class JThrottler {
   /// ensuring no pending actions are executed.
   void reset() {
     _action = null;
+    _timer?.cancel();
     _timer = null;
   }
 }

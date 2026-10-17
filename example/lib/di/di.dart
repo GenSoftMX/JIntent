@@ -8,7 +8,7 @@ import 'package:counter/src/presentation/counter/intents/get_current_counter_val
 import 'package:counter/src/presentation/counter/intents/increment_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:jintent/jintent.dart';
+import 'package:jintent/navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Di {

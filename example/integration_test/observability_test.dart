@@ -1,17 +1,18 @@
-import 'package:counter/di/di.dart';
 import 'package:counter/navigation/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:jintent/jintent.dart';
+import 'package:jintent/devtools.dart';
+
+import 'app_setup.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Observability Integration Tests', () {
     setUp(() async {
-      await Di().init();
+      await prepareCounterApp();
       // Enable metrics for testing
       JMetrics.enable();
       JMetrics.clear();
@@ -34,7 +35,7 @@ void main() {
       // Clear metrics before test actions
       JMetrics.clear();
 
-      final incrementButton = find.byIcon(Icons.add);
+      final incrementButton = find.byTooltip('Increment');
 
       // Perform actions
       await tester.tap(incrementButton);
@@ -55,8 +56,8 @@ void main() {
       // Clear metrics before test actions
       JMetrics.clear();
 
-      final incrementButton = find.byIcon(Icons.add);
-      final decrementButton = find.byIcon(Icons.remove);
+      final incrementButton = find.byTooltip('Increment');
+      final decrementButton = find.byTooltip('Decrement');
 
       // Perform multiple state changes
       await tester.tap(incrementButton);
@@ -79,21 +80,17 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      // Setup observer to capture correlation ID
-      final originalCallback = JObserver.onIntentDispatched;
-      JObserver.onIntentDispatched = (intent) {
-        originalCallback?.call(intent);
+      String? observedId;
+      JObserver.onStateChanged = (previous, next, intent) {
+        observedId = CorrelationContext.current;
       };
-
-      // Perform action within correlation context
       await CorrelationContext.runWithCorrelation(() async {
-        final incrementButton = find.byIcon(Icons.add);
-        await tester.tap(incrementButton);
+        await tester.tap(find.byTooltip('Increment'));
         await tester.pumpAndSettle();
-      });
+      }, correlationId: 'counter-integration');
 
-      // Note: In a real integration, you'd capture the correlation ID
-      // from within the intent execution. This test shows the pattern.
+      expect(observedId, 'counter-integration');
+      expect(find.text('1'), findsOneWidget);
     });
 
     testWidgets('metrics summary is accurate', (tester) async {
@@ -102,7 +99,7 @@ void main() {
 
       JMetrics.clear();
 
-      final incrementButton = find.byIcon(Icons.add);
+      final incrementButton = find.byTooltip('Increment');
 
       // Perform 3 increments
       for (int i = 0; i < 3; i++) {
@@ -136,7 +133,7 @@ void main() {
 
         correlatedLogger.info('Starting counter test');
 
-        final incrementButton = find.byIcon(Icons.add);
+        final incrementButton = find.byTooltip('Increment');
         await tester.tap(incrementButton);
         await tester.pumpAndSettle();
 
@@ -152,7 +149,7 @@ void main() {
 
       JMetrics.clear();
 
-      final incrementButton = find.byIcon(Icons.add);
+      final incrementButton = find.byTooltip('Increment');
       await tester.tap(incrementButton);
       await tester.pumpAndSettle();
 
@@ -173,7 +170,7 @@ void main() {
 
       JMetrics.clear();
 
-      final incrementButton = find.byIcon(Icons.add);
+      final incrementButton = find.byTooltip('Increment');
 
       // First increment
       await tester.tap(incrementButton);
@@ -196,7 +193,7 @@ void main() {
 
       JMetrics.clear();
 
-      final incrementButton = find.byIcon(Icons.add);
+      final incrementButton = find.byTooltip('Increment');
 
       // Go to max
       for (int i = 0; i < 10; i++) {

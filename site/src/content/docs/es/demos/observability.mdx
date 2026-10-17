@@ -1,0 +1,33 @@
+---
+title: Laboratorio de observabilidad
+description: Métricas, ids de correlación, observadores y el overlay de depuración.
+---
+
+import DemoFrame from '../../../../components/DemoFrame.astro';
+
+Cada botón ejecuta un intent mediante un dispatcher droppable mientras varios observadores vigilan a la vez: `JMetrics`, un observador personalizado que llena el registro de eventos y el overlay de depuración.
+
+<DemoFrame route="/demos/observability" title="Demo del laboratorio de observabilidad" height={640} openLabel="Abrir en una pestaña nueva" loadingLabel="Cargando la demo…" />
+
+## Pruébalo
+
+1. Pulsa **Succeed** y observa los contadores y el registro de eventos. El registro muestra el intent al empezar y al terminar, y el cambio de estado atribuido a ese intent.
+2. Pulsa **Fail**. El intent lanza una excepción y el fallo se observa mediante `onIntentFailed`.
+3. Pulsa **Cancel**. El intent se cancela a sí mismo y se informa como cancelado en lugar de despachado.
+4. Pulsa **Drop one**. Lanza dos intents seguidos; el dispatcher droppable descarta el segundo y se dispara `onIntentDropped`.
+5. Abre el overlay de depuración (botón de la esquina inferior derecha) para ver los mismos eventos dentro de la app.
+
+## Registrar un observador
+
+```dart
+class AnalyticsObserver extends JObserverDelegate {
+  @override
+  void onIntentFailed(JIntent intent, Object error, StackTrace stackTrace) {
+    report(intent.runtimeType, error, stackTrace);
+  }
+}
+
+final remove = JObserver.addObserver(AnalyticsObserver());
+```
+
+Los observadores se componen, y uno que lance una excepción nunca afecta al código que observa. Consulta la [guía de observabilidad](/JIntent/es/guides/observability/) para métricas, correlación y puntos de extensión.

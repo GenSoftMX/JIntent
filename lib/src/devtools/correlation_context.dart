@@ -16,7 +16,7 @@ import 'dart:async';
 /// // At the start of a user action:
 /// await CorrelationContext.runWithCorrelation(() async {
 ///   // All code here will have access to the same correlation ID
-///   controller.dispatch(LoginIntent());
+///   await controller.intent(LoginIntent());
 /// });
 ///
 /// // In any part of the code:

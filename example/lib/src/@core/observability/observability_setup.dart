@@ -1,5 +1,41 @@
 import 'package:flutter/foundation.dart';
+import 'package:jintent/devtools.dart';
 import 'package:jintent/jintent.dart';
+
+/// Logs how intents end without succeeding: failures, cancellations and
+/// intents dropped by a dispatcher. It extends [JObserverDelegate], so it
+/// coexists with the logging observer and the metrics observer.
+class IntentOutcomeObserver extends JObserverDelegate {
+  IntentOutcomeObserver(this._logger);
+
+  final JStructuredLogger _logger;
+
+  @override
+  void onIntentFailed(JIntent intent, Object error, StackTrace stackTrace) {
+    _logger.error(
+      'Intent failed',
+      context: {'intent': intent.runtimeType.toString()},
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+
+  @override
+  void onIntentCancelled(JIntent intent) {
+    _logger.info(
+      'Intent cancelled',
+      context: {'intent': intent.runtimeType.toString()},
+    );
+  }
+
+  @override
+  void onIntentDropped(JIntent intent) {
+    _logger.info(
+      'Intent dropped',
+      context: {'intent': intent.runtimeType.toString()},
+    );
+  }
+}
 
 /// Sets up observability features for the application.
 ///
@@ -49,6 +85,9 @@ class ObservabilitySetup {
 
     // Enable basic logging observer
     enableLoggingObserver();
+
+    // Report failed, cancelled and dropped intents through the logger
+    JObserver.addObserver(IntentOutcomeObserver(_logger!));
 
     // Enable metrics if requested
     if (enableMetrics) {

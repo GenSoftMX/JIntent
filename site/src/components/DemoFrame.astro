@@ -1,0 +1,57 @@
+---
+// Embeds one screen of the example app (built with Flutter Web into /demo/).
+interface Props {
+  route: string;
+  title: string;
+  height?: number;
+  openLabel?: string;
+  loadingLabel?: string;
+}
+const { route, title, height = 560, openLabel = 'Open in a new tab', loadingLabel = 'Loading the demo…' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// Flutter's default URL strategy is hash-based, so a deep link is `#/route`.
+const src = `${base}/demo/#${route}`;
+---
+
+<figure class="demo-frame">
+  <div class="stage" style={`height:${height}px`}>
+    <span class="loading">{loadingLabel}</span>
+    <iframe src={src} title={title} loading="lazy"></iframe>
+  </div>
+  <figcaption><a href={src} target="_blank" rel="noopener">{openLabel}</a></figcaption>
+</figure>
+
+<style>
+  .demo-frame {
+    margin: 1.5rem 0;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: var(--sl-color-bg);
+  }
+  .stage {
+    position: relative;
+  }
+  .loading {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+  }
+  /* Transparent until Flutter paints, so the label above shows while it boots. */
+  iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: transparent;
+  }
+  figcaption {
+    padding: 0.4rem 0.75rem;
+    font-size: var(--sl-text-sm);
+    border-top: 1px solid var(--sl-color-gray-5);
+  }
+</style>

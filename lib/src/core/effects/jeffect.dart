@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:jintent/jintent.dart';
-import 'package:jintent/src/core/effects/jeffect_config.dart';
 
 /// Handler for a specific effect [E] with state [S].
 /// Returns a Future that completes when the UI has finished processing the effect.

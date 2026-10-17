@@ -74,11 +74,14 @@ class JColorUtils {
   /// final blended = ColorUtils.blend(Colors.red, Colors.blue, 0.5); // Purple blend.
   /// ```
   static Color blend(Color dst, Color src, double opacity) {
+    // Color channels are normalized (0.0-1.0); fromARGB expects 0-255.
+    int channel(double from, double to) =>
+        ((from * (1.0 - opacity) + to * opacity) * 255).round().clamp(0, 255);
     return Color.fromARGB(
       255,
-      (dst.r.toDouble() * (1.0 - opacity) + src.r.toDouble() * opacity).toInt(),
-      (dst.g.toDouble() * (1.0 - opacity) + src.g.toDouble() * opacity).toInt(),
-      (dst.b.toDouble() * (1.0 - opacity) + src.b.toDouble() * opacity).toInt(),
+      channel(dst.r, src.r),
+      channel(dst.g, src.g),
+      channel(dst.b, src.b),
     );
   }
 }

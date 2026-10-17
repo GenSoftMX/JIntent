@@ -1,72 +1,100 @@
-# Side Effects (JEffect) – Complete Guide
+# Effects
 
-## Objective
-Separate transient events (navigation, dialogs, toasts, confirmations) from persistent state.
+Effects represent transient UI work outside persistent state. Import all effect
+APIs through `package:jintent/jintent.dart`.
 
-## Key Concepts
-- JEffect<T>: base effect. Can return a value (T) or fail (completeError).
-- JFireAndForgetEffect: fire-and-forget semantics; no result expected.
-- JResultEffect<T>: explicit intent to return a value.
-- JDialogEffect<T>: special case for UI interaction (dialog, sheet, picker).
-- Categories: optional for analytics/devtools.
+| Type | Purpose |
+| --- | --- |
+| `JFireAndForgetEffect` | Feedback with no expected return value |
+| `JResultEffect<T>` | Work that produces a result |
+| `JDialogEffect<T>` | UI interaction that produces a result |
 
-## Flow
-UI → controller.intent(...) → intent emits state(s) and/or side effects → UI (listener) handles effect → completes (or not) → intent (if emitAndWaitSideEffect was used) continues.
+## Registration
 
-## Emission
 ```dart
-controller.emitSideEffect(ShowSnackbarEffect(message: 'Saved'));
-final answer = await controller.emitAndWaitSideEffect(
-    ConfirmDialogEffect(question: 'Delete item?'),
-);
-```
+class ConfirmDelete extends JDialogEffect<bool> {}
 
-## Timeout
-`emitAndWaitSideEffect(effect, timeout: 5.seconds)`  
-If expired: completeError(TimeoutException).
-
-## Unhandled Strategy
-Configurable via JEffectsConfig().unhandledStrategy:
-- warnOnly
-- warnAndAutoComplete (default)
-- throwError
-
-## Best Practices
-- Always complete JResultEffect / JDialogEffect.
-- Do not use emitAndWaitSideEffect with JFireAndForgetEffect (unnecessary).
-- Avoid retaining BuildContext after long tasks (show the dialog immediately and await its Future).
-- Use categories to group metrics (e.g. navigation, dialog, feedback).
-
-## Handler Example
-```dart
-class MyEffectHandler extends JSideEffectHandler<AppState> {
-    MyEffectHandler(super.controller) {
-        register<ShowToastEffect>((e, c, ctx) async {
-            ScaffoldMessenger.of(ctx).showSnackBar(
-                SnackBar(content: Text(e.message)),
-            );
-            e.complete(null); // fire-and-forget -> optional
-        });
-
-        register<ConfirmDialogEffect>((e, c, ctx) async {
-            final accepted = await showDialog<bool>(
-                context: ctx,
-                builder: (_) => AlertDialog(
-                    title: Text('Confirm'),
-                    content: Text(e.question),
-                    actions: [
-                        TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('No')),
-                        TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('Yes')),
-                    ],
-                ),
-            );
-            e.complete(accepted ?? false);
-        });
-    }
+class CounterEffects extends JSideEffectHandler<CounterState> {
+  CounterEffects(super.controller) {
+    register<ConfirmDelete>((effect, controller, context) async {
+      // Replace with the application's confirmation dialog.
+      effect.complete(true);
+    });
+  }
 }
 ```
 
-## Testing
-- Mock effect and verify completion.
-- Timeout test (use fakeAsync).
-- Unhandled test (throwError strategy).
+`CounterState` is the application state from the [README](../README.md).
+Attach a `JEffectListener` with the controller, handler and child widget before
+emitting effects. Registration matches the concrete runtime type, not a base class.
+
+Emit feedback with `controller.emitSideEffect(effect)`. Await UI work with:
+
+```dart
+final confirmed = await controller.emitAndWaitSideEffect(
+  ConfirmDelete(),
+  timeout: const Duration(seconds: 30),
+);
+```
+
+Catch failures at the operation boundary. Handlers must complete awaited effects
+with `complete(value)` or `completeError(error, stackTrace)`.
+
+## Failures and lifecycle
+
+- Without a stream listener, awaited effects fail with `StateError`;
+  fire-and-forget emissions are dropped, unless the controller buffers effects
+  (see below).
+- With a listener but no registered handler, the default
+  `warnAndCompleteError` strategy fails the result with `StateError`.
+  `throwError` also fails `handle`; `warnOnly` leaves the result pending.
+  Deprecated `warnAndAutoComplete` also completes with error.
+- `JEffectsConfig().defaultTimeout` or the per-call timeout bounds waiting;
+  there is no implicit finite timeout. Expiry fails with `TimeoutException`.
+- Handler exceptions fail pending results. `JEffectListener` reports handler
+  failures through `FlutterError.reportError`; result awaiters still catch errors.
+- Removing or replacing a listener does not cancel running handlers. Pending
+  results require completion, timeout or controller disposal. Check
+  `context.mounted` before UI access after an asynchronous gap.
+- Controller disposal fails pending results and rejects new emissions. It does
+  not cancel external work or overwrite already completed results.
+
+## Effects emitted before the UI attaches
+
+A controller can emit during `onInit`, before any `JEffectListener` exists. By
+default those effects are lost or failed. Opt in to a bounded buffer instead:
+
+```dart
+class SplashController extends JController<SplashState> {
+  SplashController() : super(const SplashState(), effectBufferSize: 8);
+
+  @override
+  void onInit() => emitSideEffect(ShowWelcome());
+}
+```
+
+With `effectBufferSize` above zero, effects emitted while nobody listens are
+retained, in order, and delivered shortly after the next listener subscribes.
+
+- Each effect is delivered once, to whoever listens first. A second listener
+  does not replay it.
+- Awaitable effects stay pending while retained, so `emitAndWaitSideEffect`
+  waits instead of failing; use a timeout. Effects already completed (for
+  example by a timeout) are skipped on delivery.
+- When the buffer is full the oldest effect is discarded and completed with
+  `StateError`.
+- Disposal fails retained awaitable effects and drops the rest.
+- Observers receive `onEffectEmitted` when the effect is emitted, not when it
+  is delivered.
+
+The buffer is a startup aid, not a queue for a UI that is absent for long:
+retained effects can be stale by the time they are shown.
+
+Any subscription to `controller.sideEffects` counts as a listener, so a
+diagnostic `sideEffects.listen` attached before the UI receives the retained
+effects and the `JEffectListener` that follows gets none. To watch effects
+without consuming them, use `JObserver` (`onEffectEmitted`), which sees each
+effect when it is emitted and never takes it from the buffer.
+
+For consumer changes and cancellation details, see the
+[migration guide](migration.md).

@@ -1,3 +1,6 @@
+import 'dart:collection';
+
+import 'package:jintent/src/core/core.dart';
 import 'package:jintent/src/devtools/jobserver.dart';
 
 /// Metric types supported by JMetrics.
@@ -55,7 +58,19 @@ class Metric {
 /// ```
 class JMetrics {
   static bool _enabled = false;
-  static final List<Metric> _metrics = [];
+
+  /// Maximum number of metrics retained; the oldest are dropped first.
+  ///
+  /// Counters and timers keep recording while old measurements are discarded,
+  /// so long sessions do not grow memory without bound. Values below 1 are
+  /// treated as 1.
+  static int maxMetrics = defaultMaxMetrics;
+
+  /// The value [maxMetrics] has until it is changed or [reset].
+  static const int defaultMaxMetrics = 1000;
+
+  static final _metrics = Queue<Metric>();
+  static final _observer = _MetricsObserver();
   static final Map<String, DateTime> _timers = {};
   static final Map<String, int> _counters = {};
 
@@ -69,6 +84,15 @@ class JMetrics {
     _enabled = false;
   }
 
+  /// Restores the initial state: disabled, detached from [JObserver], no
+  /// metrics and the default [maxMetrics].
+  static void reset() {
+    disable();
+    detachFromObserver();
+    clear();
+    maxMetrics = defaultMaxMetrics;
+  }
+
   /// Clears all collected metrics.
   static void clear() {
     _metrics.clear();
@@ -80,6 +104,10 @@ class JMetrics {
   static void record(Metric metric) {
     if (!_enabled) return;
     _metrics.add(metric);
+    final limit = maxMetrics < 1 ? 1 : maxMetrics;
+    while (_metrics.length > limit) {
+      _metrics.removeFirst();
+    }
   }
 
   /// Increments a counter metric.
@@ -167,67 +195,29 @@ class JMetrics {
     return _metrics.where((m) => m.type == type).toList();
   }
 
-  /// Attaches metrics collection to JObserver for automatic tracking.
+  /// Attaches metrics collection to [JObserver] for automatic tracking.
   ///
-  /// This will automatically track:
-  /// - Intent dispatch count
-  /// - Intent execution time
-  /// - State change count
-  /// - Effect emission count
-  /// - Effect completion time
+  /// Registers a [JObserverDelegate], so it coexists with other observers and
+  /// callbacks. Calling it again is a no-op; [detachFromObserver] unregisters
+  /// it. This tracks:
+  /// - `intent.dispatched`, `intent.failed`, `intent.cancelled` and
+  ///   `intent.dropped` counters, tagged by type
+  /// - `intent.execution.duration` timers (microseconds) covering
+  ///   [JIntent.onInvoke] only; time spent waiting in a dispatcher queue is
+  ///   not included
+  /// - `state.changed` and `effect.emitted` counters
+  ///
+  /// Effect completion time is not measured.
   static void attachToObserver() {
     if (!_enabled) {
       enable();
     }
+    JObserver.addObserver(_observer);
+  }
 
-    // Track intent dispatches
-    final originalIntentCallback = JObserver.onIntentDispatched;
-    JObserver.onIntentDispatched = (intent) {
-      incrementCounter(
-        'intent.dispatched',
-        tags: {'type': intent.runtimeType.toString()},
-      );
-
-      // Start timing intent execution
-      startTimer(
-        'intent.execution',
-        tags: {'type': intent.runtimeType.toString()},
-      );
-
-      // Store timer ID for later stopping (would need intent lifecycle support)
-      // For now, we just track the dispatch
-
-      originalIntentCallback?.call(intent);
-    };
-
-    // Track state changes
-    final originalStateCallback = JObserver.onStateChanged;
-    JObserver.onStateChanged = (prev, next, origin) {
-      incrementCounter(
-        'state.changed',
-        tags: {
-          'stateType': next.runtimeType.toString(),
-          if (origin != null) 'originIntent': origin.runtimeType.toString(),
-        },
-      );
-
-      originalStateCallback?.call(prev, next, origin);
-    };
-
-    // Track effect emissions
-    final originalEffectCallback = JObserver.onEffectEmitted;
-    JObserver.onEffectEmitted = (effect) {
-      incrementCounter(
-        'effect.emitted',
-        tags: {
-          'type': effect.runtimeType.toString(),
-          if (effect.resolvedCategory != null)
-            'category': effect.resolvedCategory!,
-        },
-      );
-
-      originalEffectCallback?.call(effect);
-    };
+  /// Stops the automatic tracking installed by [attachToObserver].
+  static void detachFromObserver() {
+    JObserver.removeObserver(_observer);
   }
 
   /// Gets a summary of metrics as a map.
@@ -252,5 +242,82 @@ class JMetrics {
     if (tags == null || tags.isEmpty) return name;
     final tagStr = tags.entries.map((e) => '${e.key}=${e.value}').join(',');
     return '$name|$tagStr';
+  }
+}
+
+class _MetricsObserver extends JObserverDelegate {
+  // Weak association: an intent that never reports completion cannot leak.
+  final _started = Expando<Stopwatch>('JMetrics.intentStopwatch');
+
+  @override
+  void onIntentStarted(JIntent intent) {
+    _started[intent] = Stopwatch()..start();
+  }
+
+  @override
+  void onIntentDispatched(JIntent intent) {
+    final type = {'type': intent.runtimeType.toString()};
+    JMetrics.incrementCounter('intent.dispatched', tags: type);
+    _recordDuration(intent, type);
+  }
+
+  @override
+  void onIntentCancelled(JIntent intent) {
+    final type = {'type': intent.runtimeType.toString()};
+    JMetrics.incrementCounter('intent.cancelled', tags: type);
+    _recordDuration(intent, type);
+  }
+
+  @override
+  void onIntentDropped(JIntent intent) {
+    JMetrics.incrementCounter(
+      'intent.dropped',
+      tags: {'type': intent.runtimeType.toString()},
+    );
+  }
+
+  @override
+  void onIntentFailed(JIntent intent, Object error, StackTrace stackTrace) {
+    final type = {'type': intent.runtimeType.toString()};
+    JMetrics.incrementCounter('intent.failed', tags: type);
+    _recordDuration(intent, type);
+  }
+
+  void _recordDuration(JIntent intent, Map<String, String> type) {
+    final stopwatch = _started[intent];
+    if (stopwatch == null) return;
+    _started[intent] = null;
+    stopwatch.stop();
+    JMetrics.record(
+      Metric(
+        name: 'intent.execution.duration',
+        type: MetricType.timer,
+        value: stopwatch.elapsedMicroseconds,
+        tags: {...type, 'unit': 'microseconds'},
+      ),
+    );
+  }
+
+  @override
+  void onStateChanged(JState prev, JState next, JIntent? origin) {
+    JMetrics.incrementCounter(
+      'state.changed',
+      tags: {
+        'stateType': next.runtimeType.toString(),
+        if (origin != null) 'originIntent': origin.runtimeType.toString(),
+      },
+    );
+  }
+
+  @override
+  void onEffectEmitted(JEffect effect) {
+    JMetrics.incrementCounter(
+      'effect.emitted',
+      tags: {
+        'type': effect.runtimeType.toString(),
+        if (effect.resolvedCategory != null)
+          'category': effect.resolvedCategory!,
+      },
+    );
   }
 }

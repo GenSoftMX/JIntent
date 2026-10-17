@@ -9,7 +9,14 @@ on:
 
 jobs:
   analyze-and-test:
+    name: Flutter ${{ matrix.flutter-version }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.29.2 is the first stable release shipping Dart 3.7.2, the minimum
+        # SDK in pubspec.yaml. 3.47.6 is the version used for coverage.
+        flutter-version: ['3.29.2', '3.47.6']
 
     steps:
       - name: Checkout code
@@ -18,7 +25,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.4'
+          flutter-version: ${{ matrix.flutter-version }}
           channel: 'stable'
           cache: true
 
@@ -35,6 +42,7 @@ jobs:
         run: flutter test --coverage
 
       - name: Check coverage threshold
+        if: matrix.flutter-version == '3.47.6'
         run: |
           # Install lcov tools
           sudo apt-get update
@@ -58,7 +66,20 @@ jobs:
             echo "✅ Coverage $COVERAGE% meets threshold $THRESHOLD%"
           fi
 
+      - name: Get example dependencies
+        working-directory: example
+        run: flutter pub get
+
+      - name: Analyze example
+        working-directory: example
+        run: flutter analyze
+
+      - name: Test example
+        working-directory: example
+        run: flutter test
+
       - name: Upload coverage artifact
+        if: matrix.flutter-version == '3.47.6'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -66,6 +87,7 @@ jobs:
           retention-days: 30
 
       - name: Upload coverage HTML report
+        if: matrix.flutter-version == '3.47.6'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-html

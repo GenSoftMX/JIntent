@@ -16,7 +16,57 @@ class TestState extends JState {
   List<Object?> get props => [counter, text];
 }
 
+const _unchanged = Object();
+
+class ProfileState extends JState {
+  final String? name;
+  final List<String> tags;
+
+  ProfileState({this.name, List<String> tags = const []})
+    : tags = List.unmodifiable(tags);
+
+  @override
+  ProfileState copyWith({Object? name = _unchanged, List<String>? tags}) {
+    if (!identical(name, _unchanged) && name != null && name is! String) {
+      throw ArgumentError.value(name, 'name', 'Must be a String or null');
+    }
+    return ProfileState(
+      name: identical(name, _unchanged) ? this.name : name as String?,
+      tags: tags ?? this.tags,
+    );
+  }
+
+  @override
+  List<Object?> get props => [name, tags];
+}
+
 void main() {
+  test(
+    'nullable copy distinguishes omission, replacement and explicit null',
+    () {
+      final original = ProfileState(name: 'Ada');
+      expect(original.copyWith().name, 'Ada');
+      expect(original.copyWith(name: 'Grace').name, 'Grace');
+      expect(original.copyWith(name: null).name, isNull);
+      expect(original.name, 'Ada');
+      expect(() => original.copyWith(name: 42), throwsArgumentError);
+    },
+  );
+
+  test('defensive collections preserve state and value equality', () {
+    final input = ['core'];
+    final original = ProfileState(tags: input);
+    input.add('external');
+    expect(original.tags, ['core']);
+    expect(() => original.tags.add('mutation'), throwsUnsupportedError);
+    final equivalent = ProfileState(tags: const ['core']);
+    expect(original, equivalent);
+    expect(original.hashCode, equivalent.hashCode);
+    final changed = original.copyWith(tags: ['core', 'effects']);
+    expect(changed, isNot(original));
+    expect(original.tags, ['core']);
+  });
+
   test('TestState equality and copyWith', () {
     const state1 = TestState(counter: 0, text: 'hello');
     const state2 = TestState(counter: 0, text: 'hello');

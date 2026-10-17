@@ -1,9 +1,12 @@
-import 'package:counter/src/presentation/counter/controllers/controller.dart';
+import 'dart:async';
+
+import 'package:counter/src/presentation/counter/controller/controller.dart';
 import 'package:counter/src/presentation/counter/presentation/counter_effect_handler.dart';
-import 'package:counter/src/presentation/counter/states/state.dart';
+import 'package:counter/src/presentation/counter/state/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jintent/jintent.dart';
+import 'package:jintent/utils.dart';
 
 class CounterView extends ConsumerStatefulWidget {
   const CounterView({super.key});
@@ -27,6 +30,21 @@ class _CounterViewState extends ConsumerState<CounterView> {
     _counterController = ref.read(couterControllerProvider.notifier);
   }
 
+  Future<void> _runAction(Future<void> Function() action) async {
+    try {
+      await action();
+    } catch (error, stackTrace) {
+      debugPrint('Counter action failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  @override
+  void dispose() {
+    throttler.reset();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final counter = ref.watch(
@@ -37,6 +55,7 @@ class _CounterViewState extends ConsumerState<CounterView> {
       controller: _counterController,
       handler: _sideEffectHandler,
       child: Scaffold(
+        appBar: AppBar(title: const Text('Counter')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -57,7 +76,10 @@ class _CounterViewState extends ConsumerState<CounterView> {
             FloatingActionButton.extended(
               label: const Text('Increment'),
               heroTag: 'Increment',
-              onPressed: () => throttler.call(_counterController.increment),
+              onPressed:
+                  () => throttler.call(
+                    () => unawaited(_runAction(_counterController.increment)),
+                  ),
               tooltip: 'Increment',
               icon: const Icon(Icons.exposure_plus_1_outlined),
             ),
@@ -65,7 +87,10 @@ class _CounterViewState extends ConsumerState<CounterView> {
             FloatingActionButton.extended(
               label: const Text('Decrement'),
               heroTag: 'Decrement',
-              onPressed: () => throttler.call(_counterController.decrement),
+              onPressed:
+                  () => throttler.call(
+                    () => unawaited(_runAction(_counterController.decrement)),
+                  ),
               tooltip: 'Decrement',
               icon: const Icon(Icons.exposure_minus_1_sharp),
             ),

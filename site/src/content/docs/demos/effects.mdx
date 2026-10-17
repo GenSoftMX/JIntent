@@ -1,0 +1,30 @@
+---
+title: Startup & effects
+description: Effects emitted before the UI attaches, dialogs with results and timeouts.
+---
+
+import DemoFrame from '../../../components/DemoFrame.astro';
+
+This lab covers effects that wait for the UI, and the ones emitted before there is any UI to receive them.
+
+<DemoFrame route="/demos/startup" title="Startup and effects demo" height={620} />
+
+## Try it
+
+1. **Buffering.** The controller emits a welcome effect in `onInit`, before the page can listen. With **Buffer effects** on, the effect waits and a welcome message appears. Turn it off: the controller is recreated and the effect is lost.
+2. **Validation.** Enter a name shorter than 3 characters and press **Save name** to see the failure reported through state. Enter a valid one to save it.
+3. **A dialog with a result.** Press **Ask confirmation**. The intent awaits the user's answer through `emitAndWaitSideEffect`; choose **Yes** or **No** and watch the status. If you wait, the call times out and reports *No answer in time*.
+4. **A missing handler.** Press **Trigger unhandled effect**. No handler is registered for it, so the awaited result fails with a `StateError` instead of hanging, and the status line shows the failure.
+
+## The key line
+
+```dart
+class SplashController extends JController<SplashState> {
+  SplashController() : super(const SplashState(), effectBufferSize: 8);
+
+  @override
+  void onInit() => emitSideEffect(ShowWelcome());
+}
+```
+
+Details, including what happens when the buffer is full or the controller is disposed, are in the [effects guide](/JIntent/guides/effects/). The [lab source](https://github.com/GenSoftMX/JIntent/tree/main/example/lib/src/demos/startup_effects) shows the handler and the dialog helper.

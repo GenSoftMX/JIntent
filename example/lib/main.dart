@@ -1,9 +1,9 @@
 import 'package:counter/di/di.dart';
 import 'package:counter/navigation/router.dart';
+import 'package:counter/src/@core/observability/observability_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jintent/jintent.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,12 +15,9 @@ void main() async {
 
   await Di().init();
 
-  ///   // Enable metrics collection
-  JMetrics.enable();
-
-  ///
-  ///   // Optionally attach to JObserver for automatic metrics
-  JMetrics.attachToObserver();
+  // Structured logging, the logging observer, metrics and the intent outcome
+  // observer.
+  ObservabilitySetup.initialize();
 
   runApp(const ProviderScope(child: MyApp()));
 }

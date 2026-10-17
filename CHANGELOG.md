@@ -1,3 +1,101 @@
+## [3.0.0] - Unreleased
+
+Upgrading from 2.2.0: read the [migration guide](doc/migration.md). Requires
+Flutter 3.29.2 or newer.
+
+### Breaking changes
+- `package:jintent/jintent.dart` exports only the core, domain helpers,
+  `JObserver` and the dispatcher contracts. Devtools, experimental, navigation
+  and utilities moved to their own entry points. See
+  [entry points](doc/migration.md#entry-points).
+- `JController.update` and `setState` skip equal states (`==`), so no listener
+  or observer is notified. Mutating state in place is no longer supported; this
+  reverses the 2.0.1 behavior. See
+  [state equality](doc/migration.md#immutable-state-and-equality).
+- Effects: awaitable effects emitted without a listener, and unhandled awaitable
+  effects, now complete with a `StateError` instead of being lost or completing
+  with `null`. `warnAndCompleteError` replaces the deprecated
+  `warnAndAutoComplete`. See
+  [effects](doc/migration.md#effects-and-missing-handlers) and
+  [listeners](doc/migration.md#listener-presence-is-not-acknowledgement).
+- Lifecycle: invoking a running `JIntent` instance again, or dispatching or
+  invoking against a disposed controller, fails with `StateError`. Disposal
+  fails pending effect results, and the sequential dispatcher rejects that
+  controller's queued intents immediately. See
+  [disposal](doc/migration.md#controller-disposal-and-cancellation).
+- `Either` is sealed and cannot be extended or implemented. See
+  [Either](doc/migration.md#either-is-sealed).
+- `JIntent.run` and `JIntent.invoke` are `@nonVirtual`, and `JIntent` gains
+  `cancel()` and `isCancelled`. Mocks used with dispatchers must stub
+  `isCancelled`. See [intent methods](doc/migration.md#intent-methods-are-not-overridable).
+- Undo/redo capacities must be positive. See
+  [undo/redo promotion](doc/migration.md#undoredo-promotion).
+
+### Added
+- `package:jintent/undo_redo.dart`: stable snapshot and command history with an
+  observable `history`. History is preserved for equal, cancelled or disposed
+  updates. The experimental import remains a compatibility export. See
+  [undo/redo](doc/undo-redo.md).
+- `package:jintent/widgets.dart`: `JControllerBuilder` and `JControllerSelector`.
+  See [widgets](doc/widgets.md).
+- `package:jintent/testing.dart`: `JStateRecorder`, `JEffectRecorder` and
+  `resetJIntentGlobals`, plus `JEffectsConfig.reset()`. See
+  [testing](doc/testing.md).
+- `JDroppableIntentDispatcher`, `JRestartableIntentDispatcher` (grouped with
+  `keyOf` / `JIntentKey`), cooperative
+  cancellation through `JIntent.cancel`, and the optional
+  `JPendingIntentCancellation` contract. See [concurrency](doc/concurrency.md).
+- `package:jintent/jintent.dart` exports `JEffectsConfig` and
+  `UnhandledEffectStrategy`; 2.x required importing them from `src`. See
+  [effects](doc/effects.md).
+- `JIntent.current`: `JController.update` inside an intent is attributed to it
+  and ignored once it is cancelled, without passing `origin`.
+- Composable observers: `JObserverDelegate`, `JObserver.addObserver` /
+  `removeObserver` / `reset`, and `onIntentStarted`, `onIntentFailed`,
+  `onIntentCancelled` and `onIntentDropped` notifications. See
+  [observability](doc/observability.md).
+- `JController(effectBufferSize: n)` buffers effects emitted before a listener
+  attaches (opt-in; the default 0 keeps the previous behavior). See
+  [effects](doc/effects.md).
+- `Either`: exhaustive `switch`, destructurable `value`, value equality and
+  `toString`; `Right` is `const`.
+- `JMetrics`: `maxMetrics`, `detachFromObserver`, `intent.failed`,
+  `intent.cancelled` and `intent.dropped` counters and a real
+  `intent.execution.duration` timer.
+- `JDevToolsOverlay` lists failed, cancelled and dropped intents.
+
+### Changed
+- Observer and callback failures no longer reach the observed code; they are
+  reported through `FlutterError.reportError`.
+- `enableLoggingObserver`, `JEffectsLogger.attach` and `JDevToolsOverlay`
+  register observers instead of assigning the static callbacks, so they coexist.
+- `LoggingDispatcher` forwards cancellation to compatible inner dispatchers, and
+  shared sequential queues preserve other controllers' tasks and order.
+- A cancelled intent is no longer reported as dispatched.
+- Effect handlers must be registered for the concrete effect type; the
+  superclass lookup never worked and was removed.
+
+### Deprecated
+- `UnhandledEffectStrategy.warnAndAutoComplete`: use `warnAndCompleteError`.
+
+### Fixed
+- `JController.update` printed `State updated.` in release builds, and the core
+  imported `material.dart`.
+- `JMetrics` left an intent timer running and doubled counts when attached twice.
+- `Left` threw when its value was `null` and an error logger was set.
+- `JColorUtils.blend` returned near-black colors, and `JThrottler.reset` left a
+  pending timer that could release the throttle early.
+- `JEffectListener` now replaces subscriptions when its controller changes, and
+  handler failures complete pending effect results with the original error.
+- Effect timeouts report `TimeoutException`.
+- `setState` preserves the originating intent for observers, and accessing an
+  intent's controller before invocation reports a descriptive error.
+- Corrected the `JUseCaseVoid`, `JIntentHelpers` and `CorrelationContext` docs.
+
+### Documentation
+- New guides for concurrency, testing, widgets, undo/redo and migration, a
+  rewritten observability guide, and ADR-001 and ADR-002.
+
 ## [2.2.0] - 2025-11-11
 ### Documentation
 - **Data Layer Guide**: Added comprehensive `docs/DATA_LAYER_GUIDE.md` covering repository patterns, mappers, Either-based error handling, and validation pipelines

@@ -1,4 +1,5 @@
 import 'package:jintent/jintent.dart';
+import 'package:jintent/devtools.dart';
 import 'observability_setup.dart';
 
 /// Mixin that adds observability features to intents.

@@ -19,6 +19,16 @@ abstract class JIntentDispatcher {
   );
 }
 
+/// Optional lifecycle contract for dispatchers that retain queued intents.
+///
+/// [JController.dispose] calls [cancelPending] before releasing the controller.
+/// Implementations must reject queued futures for this controller without
+/// executing their intents, preserve other controllers' tasks, and leave work
+/// that has already started alone. This does not cancel external operations.
+abstract class JPendingIntentCancellation {
+  void cancelPending(JController controller);
+}
+
 /// Default dispatcher implementation that simply invokes the intent.
 ///
 /// This class dispatches intents by directly calling their `run` method.
@@ -36,7 +46,7 @@ class JDefaultIntentDispatcher implements JIntentDispatcher {
 
     await intent.run(controller);
 
-    JObserver.notifyIntentDispatched(intent);
+    JObserver.notifyIntentCompleted(intent);
   }
 }
 
@@ -47,11 +57,20 @@ class JDefaultIntentDispatcher implements JIntentDispatcher {
 ///
 /// This allows transparent logging of all intent dispatches without
 /// modifying the underlying dispatcher behavior.
-class LoggingDispatcher implements JIntentDispatcher {
+class LoggingDispatcher
+    implements JIntentDispatcher, JPendingIntentCancellation {
   final JIntentDispatcher inner;
 
   /// Creates a logging decorator around the given [inner] dispatcher.
   LoggingDispatcher(this.inner);
+
+  @override
+  void cancelPending(JController controller) {
+    final dispatcher = inner;
+    if (dispatcher is JPendingIntentCancellation) {
+      (dispatcher as JPendingIntentCancellation).cancelPending(controller);
+    }
+  }
 
   @override
   Future<void> dispatch<T extends JState>(

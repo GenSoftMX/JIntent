@@ -25,6 +25,7 @@ void main() {
       controller = MockController();
 
       when(() => intent.run(controller)).thenAnswer((_) async {});
+      when(() => intent.isCancelled).thenReturn(false);
       JObserver.onIntentDispatched = null; // Reset observer
     });
 

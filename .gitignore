@@ -28,3 +28,6 @@ migrate_working_dir/
 .dart_tool/
 build/
 coverage/
+
+# Local environment and credential files: never commit them.
+*.env

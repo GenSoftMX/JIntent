@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jintent/jintent.dart';
+import 'package:jintent/devtools.dart';
 
 class FakeIntent extends JIntent<FakeState> {
   @override
@@ -24,12 +25,8 @@ void main() {
     });
 
     tearDown(() {
-      JMetrics.disable();
-      JMetrics.clear();
-      // Clean up observers
-      JObserver.onIntentDispatched = null;
-      JObserver.onStateChanged = null;
-      JObserver.onEffectEmitted = null;
+      JMetrics.reset();
+      JObserver.reset();
     });
 
     test('starts disabled by default', () {
@@ -170,7 +167,98 @@ void main() {
       expect(json['tags']['tag1'], 'value1');
     });
 
+    test('maxMetrics drops the oldest metrics first', () {
+      JMetrics.maxMetrics = 3;
+      for (var i = 0; i < 5; i++) {
+        JMetrics.recordGauge('g', i);
+      }
+
+      expect(JMetrics.getMetrics().map((m) => m.value), [2, 3, 4]);
+    });
+
+    test('reset restores the initial state', () {
+      JMetrics.maxMetrics = 2;
+      JMetrics.attachToObserver();
+      JMetrics.recordGauge('g', 1);
+
+      JMetrics.reset();
+
+      expect(JMetrics.maxMetrics, JMetrics.defaultMaxMetrics);
+      expect(JMetrics.getMetrics(), isEmpty);
+      JMetrics.enable();
+      JObserver.notifyIntentDispatched(FakeIntent());
+      expect(JMetrics.getMetrics(), isEmpty, reason: 'observer detached');
+    });
+
+    test('maxMetrics below one keeps only the latest metric', () {
+      JMetrics.maxMetrics = 0;
+      JMetrics.recordGauge('g', 1);
+      JMetrics.recordGauge('g', 2);
+
+      expect(JMetrics.getMetrics().map((m) => m.value), [2]);
+    });
+
     group('attachToObserver', () {
+      test('attaching twice does not duplicate counts', () {
+        JMetrics.attachToObserver();
+        JMetrics.attachToObserver();
+
+        JObserver.notifyIntentDispatched(FakeIntent());
+
+        expect(JMetrics.getMetricsByName('intent.dispatched'), hasLength(1));
+      });
+
+      test('detachFromObserver stops tracking', () {
+        JMetrics.attachToObserver();
+        JMetrics.detachFromObserver();
+
+        JObserver.notifyIntentDispatched(FakeIntent());
+
+        expect(JMetrics.getMetrics(), isEmpty);
+      });
+
+      test(
+        'measures real intent execution time and counts completion',
+        () async {
+          JMetrics.attachToObserver();
+
+          final intent = _SlowIntent(const Duration(milliseconds: 20));
+          await intent.run(_Controller());
+          JObserver.notifyIntentDispatched(intent);
+
+          final timers = JMetrics.getMetricsByName('intent.execution.duration');
+          expect(timers, hasLength(1));
+          expect(timers.single.type, MetricType.timer);
+          expect(timers.single.tags['type'], '_SlowIntent');
+          expect(timers.single.value, greaterThanOrEqualTo(15000));
+          expect(JMetrics.getMetricsByName('intent.dispatched'), hasLength(1));
+        },
+      );
+
+      test('counts failed intents and still records their duration', () async {
+        JMetrics.attachToObserver();
+
+        await expectLater(
+          _FailingIntent().run(_Controller()),
+          throwsStateError,
+        );
+
+        expect(JMetrics.getMetricsByName('intent.failed'), hasLength(1));
+        expect(JMetrics.getMetricsByName('intent.dispatched'), isEmpty);
+        expect(
+          JMetrics.getMetricsByName('intent.execution.duration'),
+          hasLength(1),
+        );
+      });
+
+      test('does not record a duration for an intent it never saw start', () {
+        JMetrics.attachToObserver();
+
+        JObserver.notifyIntentDispatched(FakeIntent());
+
+        expect(JMetrics.getMetricsByName('intent.execution.duration'), isEmpty);
+      });
+
       test('tracks intent dispatches', () {
         JMetrics.attachToObserver();
 
@@ -213,7 +301,7 @@ void main() {
         bool originalEffectCalled = false;
 
         JObserver.onIntentDispatched = (_) => originalIntentCalled = true;
-        JObserver.onStateChanged = (_, __, ___) => originalStateCalled = true;
+        JObserver.onStateChanged = (_, _, _) => originalStateCalled = true;
         JObserver.onEffectEmitted = (_) => originalEffectCalled = true;
 
         JMetrics.attachToObserver();
@@ -237,4 +325,34 @@ void main() {
       expect(MetricType.timer.name, 'timer');
     });
   });
+}
+
+class _CounterState extends JState {
+  const _CounterState();
+
+  @override
+  JState copyWith() => this;
+
+  @override
+  List<Object?> get props => [];
+}
+
+class _Controller extends JController<_CounterState> {
+  _Controller() : super(const _CounterState());
+
+  @override
+  void onInit() {}
+}
+
+class _SlowIntent extends JIntent<_CounterState> {
+  _SlowIntent(this.delay);
+  final Duration delay;
+
+  @override
+  Future<void> onInvoke() => Future<void>.delayed(delay);
+}
+
+class _FailingIntent extends JIntent<_CounterState> {
+  @override
+  Future<void> onInvoke() async => throw StateError('boom');
 }

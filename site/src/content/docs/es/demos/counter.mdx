@@ -1,0 +1,24 @@
+---
+title: Contador
+description: La arquitectura completa en vivo, de los casos de uso a los effects.
+---
+
+import DemoFrame from '../../../../components/DemoFrame.astro';
+
+El contador es la app JIntent completa más pequeña. Un toque llama a un método del controlador, el controlador ejecuta un intent, el intent valida mediante un caso de uso, persiste mediante un repositorio y actualiza el estado. Los rechazos no tocan el estado: viajan como effects.
+
+<DemoFrame route="/counter" title="Demo del contador" height={520} openLabel="Abrir en una pestaña nueva" loadingLabel="Cargando la demo…" />
+
+## Pruébalo
+
+1. Pulsa **Increment** varias veces (un throttle de 200 ms ignora las pulsaciones más rápidas). Cada pulsación ejecuta un `IncrementIntent` que actualiza `count` en el estado.
+2. Al llegar a 10 se emite un `ShowSuccessEffect`: un snackbar «Milestone reached» de un solo uso que no forma parte del estado.
+3. Sigue pulsando **Increment** en 10. El contador se queda en 10 y, en una de cada dos llamadas (un validador con estado, a propósito), el caso de uso rechaza el valor. El rechazo es un **effect** `ShowRejectOperation` mostrado como un snackbar rojo, no un cambio de estado.
+
+## Qué mirar en el código
+
+- Los intents de [`presentation/counter/intents`](https://github.com/GenSoftMX/JIntent/tree/main/example/lib/src/presentation/counter/intents) convierten un `Either` del caso de uso en una actualización o en un effect.
+- [`counter_effect_handler.dart`](https://github.com/GenSoftMX/JIntent/blob/main/example/lib/src/presentation/counter/presentation/counter_effect_handler.dart) asocia cada tipo de effect con su UI.
+- Esta demo lee el estado con Riverpod; las demás usan `JControllerBuilder`. Ambas funcionan porque un `JController` es un `StateNotifier`.
+
+Guías relacionadas: [effects](/JIntent/es/guides/effects/), [manejo de errores](/JIntent/es/guides/error-handling/) y [helpers de dominio](/JIntent/es/guides/domain-helpers/).

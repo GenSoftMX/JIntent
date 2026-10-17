@@ -1,0 +1,28 @@
+# pub uses this file INSTEAD of .gitignore in this directory, so every
+# .gitignore entry is repeated here. Keep both files in sync.
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+*.iml
+*.ipr
+*.iws
+.idea/
+/pubspec.lock
+**/doc/api/
+.dart_tool/
+build/
+coverage/
+*.env
+
+# Repository tooling and sources that are not part of the package.
+/AGENTS.md
+/jintent.html
+/assets/
+/site/

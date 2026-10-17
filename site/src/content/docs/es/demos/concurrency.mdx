@@ -1,0 +1,39 @@
+---
+title: Laboratorio de concurrencia
+description: Las mismas cinco tareas con cuatro dispatchers.
+---
+
+import DemoFrame from '../../../../components/DemoFrame.astro';
+
+Se lanzan cinco tareas con 80 ms de diferencia, cada una un poco más corta que la anterior. El dispatcher que elijas decide qué ocurre cuando se solapan, y la línea de tiempo muestra lo que vio un observador.
+
+<DemoFrame route="/demos/concurrency" title="Demo del laboratorio de concurrencia" height={600} openLabel="Abrir en una pestaña nueva" loadingLabel="Cargando la demo…" />
+
+## Pruébalo
+
+Elige una estrategia, pulsa **Fire 5 tasks** y compara la línea de tiempo. Después pulsa **Reset** y prueba la siguiente.
+
+1. **Sequential** (la predeterminada): las tareas se ejecutan una a la vez, en orden. No se pierde nada, pero las tareas posteriores esperan a las anteriores.
+2. **Concurrent**: cada tarea arranca de inmediato. Terminan en el orden en que acaba su trabajo, así que las tareas posteriores, más cortas, adelantan a las anteriores.
+3. **Droppable**: las tareas que llegan mientras otra se ejecuta se ignoran. Es lo ideal para botones de enviar y para refrescar.
+4. **Restartable**: cada tarea nueva cancela a la que está en ejecución, de forma cooperativa. Solo gana la última, que es lo que quieres para buscar mientras se escribe.
+
+## El cambio de una línea
+
+Cambiar de estrategia es un argumento del constructor:
+
+```dart
+class SearchController extends JController<SearchState> {
+  SearchController()
+    : super(const SearchState(), dispatcher: JRestartableIntentDispatcher());
+
+  Future<void> search(String query) => intent(SearchIntent(query));
+
+  @override
+  void onInit() {}
+}
+```
+
+Reiniciar nunca interrumpe el código en ejecución. Marca el intent antiguo como cancelado e ignora sus actualizaciones de estado posteriores, de modo que una solicitud lenta anterior no puede sobrescribir un resultado más nuevo.
+
+Lee el contrato completo en la [guía de concurrencia](/JIntent/es/guides/concurrency/), o el [código del laboratorio](https://github.com/GenSoftMX/JIntent/tree/main/example/lib/src/demos/concurrency_lab).

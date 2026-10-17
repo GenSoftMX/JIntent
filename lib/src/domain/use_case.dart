@@ -71,7 +71,8 @@ abstract class JSyncUseCase<INPUT, OUTPUT> {
   Either<Exception, OUTPUT> run(INPUT input);
 }
 
-/// Interface for asynchronous use cases that do not return a value.
+/// Interface for asynchronous use cases that do not return a value or an
+/// [Either].
 ///
 /// Useful for use cases that represent actions or side-effects.
 ///
@@ -79,8 +80,8 @@ abstract class JSyncUseCase<INPUT, OUTPUT> {
 abstract class JUseCaseVoid<INPUT> {
   /// Executes the use case with the given [input].
   ///
-  /// Returns an [Either] containing an [Exception] on failure
-  /// or `void` on success.
+  /// Completes when the action finishes. Failures surface as errors of the
+  /// returned future; this contract does not use [Either].
   Future<void> run(INPUT input);
 }
 
