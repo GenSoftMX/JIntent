@@ -1,6 +1,6 @@
 # ADR-001: Optional entry points and core refinements
 
-**Status:** Accepted for unreleased 3.0.0
+**Status:** Accepted for 3.0.0
 
 **Date:** 2026-10-16
 

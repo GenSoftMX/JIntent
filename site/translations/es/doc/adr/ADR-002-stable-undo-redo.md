@@ -1,6 +1,6 @@
 # ADR-002: Undo/redo opcional y estable
 
-**Estado:** Aceptado para la 3.0.0 aún sin publicar
+**Estado:** Aceptado para la 3.0.0
 
 **Fecha:** 2026-10-16
 

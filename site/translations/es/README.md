@@ -8,6 +8,9 @@ effects de UI de un solo uso. Los controladores gestionan el estado; los intents
 realizan las operaciones; los handlers de effects presentan diálogos, navegación y
 retroalimentación fuera del estado persistente.
 
+Consulta la [guía interactiva](https://gensoftmx.github.io/JIntent/) (en inglés y
+español) con los conceptos, demos en vivo y la referencia de la API.
+
 ## Instalación
 
 ```sh

@@ -1,6 +1,6 @@
 # Migration: 2.x to 3.0.0
 
-Version 3.0.0 is not published yet. Public signatures are largely preserved, but
+Version 3.0.0 is a major release. Public signatures are largely preserved, but
 the behavior changes below are incompatible with 2.x and require consumer review.
 
 ## Immutable state and equality
@@ -211,7 +211,7 @@ this release is a major version.
 
 ## Undo/redo promotion
 
-Undo/redo is stable in the unreleased 3.0.0. The experimental import remains a
+Undo/redo is stable since 3.0.0. The experimental import remains a
 compatibility export. Use the stable import for new code, observe `history` for
 button availability, and use positive history capacities. See the
 [undo/redo migration and contracts](undo-redo.md#migration-from-experimental).

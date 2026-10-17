@@ -7,6 +7,9 @@ JIntent is a Flutter library for explicit intents, immutable state and one-time
 UI effects. Controllers manage state; intents perform operations; effect
 handlers present dialogs, navigation and feedback outside persistent state.
 
+Read the [interactive guide](https://gensoftmx.github.io/JIntent/) (English and
+Spanish) for the concepts, live demos and the API reference.
+
 ## Installation
 
 ```sh

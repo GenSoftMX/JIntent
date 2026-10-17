@@ -1,6 +1,6 @@
 # Undo and redo
 
-Undo/redo is a stable, optional API in the unreleased 3.0.0. Import it alongside
+Undo/redo is a stable, optional API since 3.0.0. Import it alongside
 core types:
 
 ```dart
