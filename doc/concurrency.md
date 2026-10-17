@@ -55,7 +55,7 @@ operations keep running unless you use their own cancellation API.
 
 The superseded intent's future still reports its own result or error, and
 observers receive `onIntentCancelled` instead of `onIntentDispatched` when it
-finishes. `cancel() is a no-op on an intent that is not running, and the
+finishes. `cancel()` is a no-op on an intent that is not running, and the
 flag resets when the intent is invoked again.
 
 ## Disposal
