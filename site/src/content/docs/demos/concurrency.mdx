@@ -1,0 +1,39 @@
+---
+title: Concurrency Lab
+description: The same five tasks under four dispatchers.
+---
+
+import DemoFrame from '../../../components/DemoFrame.astro';
+
+Five tasks are fired 80 ms apart, each slightly shorter than the one before. The dispatcher you pick decides what happens when they overlap, and the timeline shows what an observer saw.
+
+<DemoFrame route="/demos/concurrency" title="Concurrency Lab demo" height={600} />
+
+## Try it
+
+Pick a strategy, press **Fire 5 tasks**, and compare the timeline. Then press **Reset** and try the next one.
+
+1. **Sequential** (the default): tasks run one at a time, in order. Nothing is lost, but later tasks wait for earlier ones.
+2. **Concurrent**: every task starts immediately. They finish in the order their work ends, so the shorter later tasks overtake the earlier ones.
+3. **Droppable**: tasks that arrive while one is running are ignored. Good for submit buttons and refresh.
+4. **Restartable**: each new task cancels the running one, cooperatively. Only the latest wins, which is what you want for search-as-you-type.
+
+## The one-line change
+
+Switching strategy is a constructor argument:
+
+```dart
+class SearchController extends JController<SearchState> {
+  SearchController()
+    : super(const SearchState(), dispatcher: JRestartableIntentDispatcher());
+
+  Future<void> search(String query) => intent(SearchIntent(query));
+
+  @override
+  void onInit() {}
+}
+```
+
+Restarting never interrupts running code. It marks the old intent as cancelled and ignores its later state updates, so a slow earlier request cannot overwrite a newer result.
+
+Read the full contract in the [concurrency guide](/JIntent/guides/concurrency/), or the [lab source](https://github.com/GenSoftMX/JIntent/tree/main/example/lib/src/demos/concurrency_lab).

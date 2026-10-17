@@ -112,6 +112,8 @@ See [effects](doc/effects.md) for registration, failures and timeouts, and
 
 ## Documentation
 
+- [Interactive guide](https://gensoftmx.github.io/JIntent/) in English and
+  Spanish, with live demos and diagrams.
 - [Effects](doc/effects.md) and [error handling](doc/error-handling.md).
 - [Concurrency strategies](doc/concurrency.md): sequential, droppable,
   restartable and cooperative cancellation.

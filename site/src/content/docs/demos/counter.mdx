@@ -1,0 +1,24 @@
+---
+title: Counter
+description: The full architecture running live, from use cases to effects.
+---
+
+import DemoFrame from '../../../components/DemoFrame.astro';
+
+The counter is the smallest complete JIntent app. A tap calls a controller method, the controller runs an intent, the intent validates through a use case, persists through a repository and updates the state. Rejections do not touch the state: they travel as effects.
+
+<DemoFrame route="/counter" title="Counter demo" height={520} />
+
+## Try it
+
+1. Press **Increment** a few times (a 200 ms throttle ignores presses that come faster). Each press runs an `IncrementIntent` that updates `count` in the state.
+2. Reaching 10 emits a `ShowSuccessEffect`: a one-time "Milestone reached" snackbar that is not part of the state.
+3. Keep pressing **Increment** at 10. The count stays at 10, and on every second call (a stateful validator, on purpose) the use case rejects the value. The rejection is a `ShowRejectOperation` **effect** shown as a red snackbar, not a change of state.
+
+## What to look at in the code
+
+- The intents under [`presentation/counter/intents`](https://github.com/GenSoftMX/JIntent/tree/main/example/lib/src/presentation/counter/intents) fold an `Either` from the use case into an update or an effect.
+- [`counter_effect_handler.dart`](https://github.com/GenSoftMX/JIntent/blob/main/example/lib/src/presentation/counter/presentation/counter_effect_handler.dart) maps every effect type to its UI.
+- This demo reads state with Riverpod; the other demos use `JControllerBuilder`. Both work because a `JController` is a `StateNotifier`.
+
+Related guides: [effects](/JIntent/guides/effects/), [error handling](/JIntent/guides/error-handling/) and [domain helpers](/JIntent/guides/domain-helpers/).

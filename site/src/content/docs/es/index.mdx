@@ -1,0 +1,32 @@
+---
+title: JIntent
+description: Intents explícitos, estado inmutable y effects de UI de un solo uso para Flutter.
+template: splash
+hero:
+  tagline: Intents explícitos, estado inmutable y effects de UI de un solo uso para Flutter.
+  actions:
+    - text: Primeros pasos
+      link: getting-started/
+      icon: right-arrow
+    - text: Prueba las demos en vivo
+      link: demos/concurrency/
+      icon: rocket
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="Intents" icon="pencil">
+    Cada cambio de estado es una operación con nombre y awaitable que puedes probar, observar y cancelar.
+  </Card>
+  <Card title="Estado inmutable" icon="seti:json">
+    Los estados se comparan por valor, así que las actualizaciones iguales se omiten y las reconstrucciones son precisas.
+  </Card>
+  <Card title="Effects de un solo uso" icon="information">
+    Los diálogos, la navegación y la retroalimentación viajan como effects, fuera del estado persistente.
+  </Card>
+  <Card title="Ejecútalo en el navegador" icon="rocket">
+    La guía embebe la app de ejemplo real, compilada con Flutter Web, junto al texto que la explica.
+  </Card>
+</CardGrid>

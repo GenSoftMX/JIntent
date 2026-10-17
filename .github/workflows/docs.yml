@@ -1,0 +1,101 @@
+---
+name: Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'doc/**'
+      - 'README.md'
+      - 'lib/**'
+      - 'example/**'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'doc/**'
+      - 'README.md'
+      - 'lib/**'
+      - 'example/**'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+# One run per ref. A publishing run on main is never cancelled; superseded pull
+# request runs are.
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # Same version CI uses for coverage; keep in sync with ci.yml.
+  FLUTTER_VERSION: '3.47.6'
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Build the live demos (Flutter Web)
+        run: site/scripts/build-demo.sh
+
+      - name: Install site dependencies
+        working-directory: site
+        run: npm ci
+
+      - name: Build the site
+        working-directory: site
+        run: npm run build
+
+      - name: Generate the API reference
+        run: |
+          flutter pub get
+          dart doc --output site/dist/api
+
+      - name: Check internal links
+        working-directory: site
+        run: npm run check-links
+
+      - name: Upload the site
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
