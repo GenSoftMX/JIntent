@@ -8,6 +8,8 @@ entry point; load only the resources the task needs.
   `navigation.dart`, `utils.dart` and `testing.dart` are optional entry points.
 - `lib/src/`: core, domain, devtools, navigation, utils and experimental.
 - `test/`: library tests; `example/`: consumer application.
+- `site/`: interactive guide in English and Spanish (Astro Starlight); see
+  `site/README.md`.
 - `doc/`: user guides; `doc/adr/`: ADR-000, ADR-001 and ADR-002 (accepted). Check them against the code.
 
 ## How the agent works
