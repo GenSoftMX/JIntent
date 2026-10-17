@@ -1,0 +1,30 @@
+---
+title: Arranque y effects
+description: Effects emitidos antes de que la UI se conecte, diálogos con resultado y timeouts.
+---
+
+import DemoFrame from '../../../../components/DemoFrame.astro';
+
+Este laboratorio cubre los effects que esperan a la UI y los que se emiten antes de que haya una UI que los reciba.
+
+<DemoFrame route="/demos/startup" title="Demo de arranque y effects" height={620} openLabel="Abrir en una pestaña nueva" loadingLabel="Cargando la demo…" />
+
+## Pruébalo
+
+1. **Búfer.** El controlador emite un effect de bienvenida en `onInit`, antes de que la página pueda escuchar. Con **Buffer effects** activado, el effect espera y aparece un mensaje de bienvenida. Desactívalo: el controlador se recrea y el effect se pierde.
+2. **Validación.** Escribe un nombre de menos de 3 caracteres y pulsa **Save name** para ver el fallo informado mediante el estado. Escribe uno válido para guardarlo.
+3. **Un diálogo con resultado.** Pulsa **Ask confirmation**. El intent espera la respuesta del usuario con `emitAndWaitSideEffect`; elige **Yes** o **No** y observa el estado. Si esperas, la llamada vence por timeout e informa *No answer in time*.
+4. **Un handler ausente.** Pulsa **Trigger unhandled effect**. No hay ningún handler registrado para él, así que el resultado esperado falla con un `StateError` en lugar de quedarse colgado, y la línea de estado muestra el fallo.
+
+## La línea clave
+
+```dart
+class SplashController extends JController<SplashState> {
+  SplashController() : super(const SplashState(), effectBufferSize: 8);
+
+  @override
+  void onInit() => emitSideEffect(ShowWelcome());
+}
+```
+
+Los detalles, incluido lo que ocurre cuando el búfer se llena o el controlador se libera, están en la [guía de effects](/JIntent/es/guides/effects/). El [código del laboratorio](https://github.com/GenSoftMX/JIntent/tree/main/example/lib/src/demos/startup_effects) muestra el handler y el helper de diálogo.

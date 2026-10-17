@@ -1,0 +1,75 @@
+---
+title: Arquitectura
+description: Cómo encajan el estado, los intents, los controladores y los effects.
+---
+
+JIntent aplica un flujo de inspiración MVI: la UI le pide algo a un **controlador**, el controlador ejecuta un **intent** con nombre, el intent actualiza el **estado** inmutable y la UI se reconstruye a partir de él. Todo lo transitorio (un diálogo, un snackbar, una navegación) sale por un stream de **effects** separado en lugar de vivir en el estado.
+
+## El ciclo
+
+```mermaid
+flowchart TD
+  UI["Widget"] -->|"controller.increment()"| C["JController"]
+  C -->|"intent(...)"| D["Dispatcher"]
+  D --> I["JIntent.onInvoke"]
+  I -->|"update(reducer)"| S[("JState")]
+  S -->|"notifica"| B["JControllerBuilder"]
+  B --> UI
+  I -->|"emitSideEffect(...)"| E["Stream de effects"]
+  E --> H["JEffectListener + JSideEffectHandler"]
+  H -->|"diálogo, snackbar, navegación"| UI
+```
+
+| Pieza | Responsabilidad |
+| --- | --- |
+| `JState` | Datos inmutables comparados por valor. Una actualización igual al estado actual se omite. |
+| `JIntent` | Una operación awaitable. Lee y actualiza el estado y puede emitir effects. |
+| `JController` | Es dueño del estado y despacha los intents. Es un `StateNotifier`. |
+| Dispatcher | Decide cómo se ejecutan los intents que se solapan: en orden, de forma concurrente, descartados o reiniciados. Consulta [concurrencia](/JIntent/es/guides/concurrency/). |
+| `JEffect` | Un evento de UI transitorio, fuera del estado persistente. |
+| `JSideEffectHandler` | Asocia cada tipo concreto de effect con la UI que lo presenta. |
+
+## Un effect que espera a la UI
+
+Los effects esperables permiten que un intent le haga una pregunta a la UI y continúe con la respuesta. La [demo](/JIntent/es/demos/effects/) *Arranque y effects* ejecuta exactamente este flujo.
+
+```mermaid
+sequenceDiagram
+  participant I as Intent
+  participant C as Controlador
+  participant H as Handler del effect
+  participant U as Usuario
+  I->>C: emitAndWaitSideEffect(ConfirmEffect, timeout)
+  C->>H: effect por el stream sideEffects
+  H->>U: muestra un diálogo
+  U-->>H: pulsa Sí
+  H-->>C: effect.complete(true)
+  C-->>I: true
+  Note over I,C: Un listener ausente, un handler ausente<br/>o un timeout hacen fallar la llamada.
+```
+
+## Capas y puntos de entrada
+
+El núcleo es deliberadamente pequeño. Los helpers de dominio son opcionales y la aplicación es dueña de la persistencia, la red y la navegación. Las funciones opcionales viven en sus propios puntos de entrada para que importes solo lo que usas.
+
+```mermaid
+flowchart TB
+  subgraph Core["package:jintent/jintent.dart"]
+    direction LR
+    A["JState · JIntent · JController"] --- B["Effects · Dispatchers · JObserver"]
+    B --- D["Either · Casos de uso · Mappers"]
+  end
+  Core --> W["widgets.dart<br/>builder y selector"]
+  Core --> U["undo_redo.dart<br/>historial y comandos"]
+  Core --> V["devtools.dart<br/>registro, métricas, overlay"]
+  Core --> T["testing.dart<br/>recorders y reinicio"]
+  Core --> N["navigation.dart · utils.dart"]
+```
+
+El razonamiento detrás de estos límites está recogido en los [registros de arquitectura](/JIntent/es/adr/).
+
+## A dónde ir después
+
+- Recorre el ciclo tú mismo en la [demo del contador](/JIntent/es/demos/counter/).
+- Mira cómo se comportan los intents que se solapan en el [laboratorio de concurrencia](/JIntent/es/demos/concurrency/).
+- Lee la [guía de effects](/JIntent/es/guides/effects/) para fallos, timeouts y búfer.

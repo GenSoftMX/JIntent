@@ -1,0 +1,32 @@
+---
+title: Notas con undo
+description: Undo y redo estables con un historial observable.
+---
+
+import DemoFrame from '../../../../components/DemoFrame.astro';
+
+Un pequeño editor de notas cuyos cambios se registran con `UndoRedoMixin`. El historial son metadatos que la UI escucha por separado de las notas en sí.
+
+<DemoFrame route="/demos/undo" title="Demo de notas con undo" height={600} openLabel="Abrir en una pestaña nueva" loadingLabel="Cargando la demo…" />
+
+## Pruébalo
+
+1. Escribe una nota en el campo y pulsa el botón **+**. Agrega varias.
+2. Usa las flechas de undo y redo y observa cómo las notas desaparecen y vuelven. Los botones se habilitan y deshabilitan a partir del historial, no de las notas.
+3. Pulsa **Remove last** y después la flecha de undo para recuperar la nota.
+4. Pulsa **Clear history**. Las notas se quedan, pero las flechas de undo y redo se apagan, porque vaciar el historial cambia metadatos, no el documento.
+5. Tras deshacer, agrega una nota nueva: la rama de redo se descarta, como en cualquier editor.
+
+## El cableado
+
+```dart
+class NotesController extends JController<NotesState>
+    with UndoRedoMixin<NotesState> {
+  NotesController() : super(const NotesState());
+
+  @override
+  void onInit() => enableUndoRedo(maxHistorySize: 20);
+}
+```
+
+Undo y redo restauran instantáneas del estado local. No revierten una petición, una escritura en base de datos ni un diálogo. Lee la [guía de undo y redo](/JIntent/es/guides/undo-redo/) para el orden, la capacidad y la alternativa basada en comandos.
