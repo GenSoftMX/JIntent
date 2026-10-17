@@ -23,6 +23,7 @@ export const ADRS = [
   'ADR-000-context-and-high-level-decisions',
   'ADR-001-optional-entry-points-and-core-refinements',
   'ADR-002-stable-undo-redo',
+  'ADR-003-equatable-2-and-3',
 ];
 
 /** Repo-relative path of a Markdown source -> site path (no base, no locale). */

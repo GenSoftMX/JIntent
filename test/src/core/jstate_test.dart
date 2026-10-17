@@ -40,7 +40,38 @@ class ProfileState extends JState {
   List<Object?> get props => [name, tags];
 }
 
+class InitialState extends JState {
+  const InitialState();
+
+  @override
+  InitialState copyWith() => this;
+
+  @override
+  List<Object?> get props => const [];
+}
+
+class LoadingState extends JState {
+  const LoadingState();
+
+  @override
+  LoadingState copyWith() => this;
+
+  @override
+  List<Object?> get props => const [];
+}
+
 void main() {
+  test('distinct state classes with equal props are not equal', () {
+    // Guards the equatable version range (ADR-003): if a release stopped
+    // comparing runtimeType, a transition between such states would be skipped.
+    expect(const InitialState() == const LoadingState(), isFalse);
+    expect(
+      const InitialState().hashCode == const LoadingState().hashCode,
+      isFalse,
+    );
+    expect(const LoadingState(), equals(const LoadingState()));
+  });
+
   test(
     'nullable copy distinguishes omission, replacement and explicit null',
     () {

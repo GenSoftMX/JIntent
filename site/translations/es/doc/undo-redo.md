@@ -1,6 +1,6 @@
 # Undo y redo
 
-Undo/redo es una API estable y opcional en la versión 3.0.0 aún sin publicar.
+Undo/redo es una API estable y opcional desde la versión 3.0.0.
 Impórtala junto a los tipos del núcleo:
 
 ```dart

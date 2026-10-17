@@ -8,10 +8,20 @@ effects de UI de un solo uso. Los controladores gestionan el estado; los intents
 realizan las operaciones; los handlers de effects presentan diálogos, navegación y
 retroalimentación fuera del estado persistente.
 
+Consulta la [guía interactiva](https://gensoftmx.github.io/JIntent/) (en inglés y
+español) con los conceptos, demos en vivo y la referencia de la API.
+
 ## Instalación
 
 ```sh
 flutter pub add jintent
+```
+
+O decláralo tú mismo. La versión 3.0.0 requiere Flutter 3.29.2 o superior:
+
+```yaml
+dependencies:
+  jintent: ^3.0.0
 ```
 
 Importa el punto de entrada público:
@@ -40,6 +50,28 @@ heredada.
 Actualizar desde 2.x cambia la igualdad de estado, los fallos de effects y el
 comportamiento de la liberación. Revisa primero la
 [guía de migración](doc/migration.md).
+
+## Novedades de la 3.0.0
+
+- **Entry points:** `jintent.dart` contiene solo el núcleo; devtools, undo/redo,
+  widgets, navegación, utilidades y helpers de pruebas pasaron a sus propios
+  imports.
+- **Estado predecible:** las actualizaciones iguales al estado actual se omiten,
+  así que listeners y observadores solo ven cambios reales.
+- **Effects más seguros:** un effect esperado sin listener ni handler falla con
+  `StateError`, y la liberación hace fallar los resultados pendientes. El buffer
+  de effects es opcional.
+- **Concurrencia:** dispatchers droppable y restartable, con cancelación
+  cooperativa mediante `JIntent.cancel`.
+- **Observabilidad:** `JObserverDelegate` componibles que también reportan
+  intents fallidos, cancelados y descartados, además de métricas y overlay más
+  completos.
+- **También nuevo:** undo/redo estable con historial observable,
+  `JControllerBuilder` y `JControllerSelector`, y grabadores de pruebas en
+  `package:jintent/testing.dart`.
+
+Varios de estos cambios modifican el comportamiento respecto a 2.x. Consulta el
+[changelog](CHANGELOG.md) completo y la [guía de migración](doc/migration.md).
 
 ## Ejemplo mínimo
 

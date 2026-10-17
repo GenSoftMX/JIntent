@@ -1,6 +1,6 @@
 # ADR-001: Puntos de entrada opcionales y refinamientos del núcleo
 
-**Estado:** Aceptado para la 3.0.0 aún sin publicar
+**Estado:** Aceptado para la 3.0.0
 
 **Fecha:** 2026-10-16
 
@@ -24,7 +24,7 @@ invisibles. Los effects emitidos antes de que la UI se conectara se perdían.
 | D18 | Los observadores son `JObserverDelegate`s componibles registrados con `JObserver.addObserver`; los intents informan inicio, fallo, cancelación y descarte. Los callbacks estáticos permanecen para los eventos originales. Los fallos de observadores nunca llegan al código observado. | Refina D9. Las herramientas dejan de pisarse entre sí y los fallos pasan a ser observables. |
 | D19 | Las estrategias de concurrencia de intents más allá de FIFO (droppable, restartable) usan cancelación cooperativa; los intents cancelados no pueden escribir estado. Las actualizaciones se atribuyen a su intent mediante una zona (`JIntent.current`), por lo que la garantía no depende de que quien llama pase `origin`. | Extiende D6 sin cambiar el valor predeterminado. El código en ejecución nunca se interrumpe. |
 | D20 | El búfer de effects es opcional (`effectBufferSize`, 0 por defecto). | Cubre los effects emitidos antes de que la UI se conecte sin cambiar la semántica predeterminada de D5. |
-| D21 | `state_notifier ^1.0.0` sigue siendo la base de `JController` y `equatable` sigue en `^2.0.5`. | Ver abajo. |
+| D21 | `state_notifier ^1.0.0` sigue siendo la base de `JController` y `equatable` sigue en `^2.0.5`. | Ver abajo. La parte de `equatable` queda reemplazada por el [ADR-003](ADR-003-equatable-2-and-3.md). |
 
 ## Evidencia para D21 (consultada el 2026-10-16)
 

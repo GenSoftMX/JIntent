@@ -1,6 +1,6 @@
 # Migración: de 2.x a 3.0.0
 
-La versión 3.0.0 aún no está publicada. Las firmas públicas se conservan en su
+La versión 3.0.0 es una versión mayor. Las firmas públicas se conservan en su
 mayor parte, pero los cambios de comportamiento descritos abajo son incompatibles
 con 2.x y requieren la revisión del consumidor.
 
@@ -229,7 +229,7 @@ vida), por lo que esta versión es mayor.
 
 ## Promoción de undo/redo
 
-Undo/redo es estable en la 3.0.0 aún sin publicar. La importación experimental
+Undo/redo es estable desde la 3.0.0. La importación experimental
 sigue siendo una exportación de compatibilidad. Usa la importación estable en el
 código nuevo, observa `history` para la disponibilidad de los botones y usa
 capacidades de historial positivas. Consulta la

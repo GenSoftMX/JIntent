@@ -1,6 +1,6 @@
 # ADR-002: Stable optional undo/redo
 
-**Status:** Accepted for unreleased 3.0.0
+**Status:** Accepted for 3.0.0
 
 **Date:** 2026-10-16
 
