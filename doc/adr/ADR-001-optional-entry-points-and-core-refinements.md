@@ -23,7 +23,7 @@ Effects emitted before the UI attached were lost.
 | D18 | Observers are composable `JObserverDelegate`s registered with `JObserver.addObserver`; intents report start, failure, cancellation and drops. Static callbacks remain for the original events. Observer failures never reach observed code. | Refines D9. Tools stop overwriting each other and failures become observable. |
 | D19 | Intent concurrency strategies beyond FIFO (droppable, restartable) use cooperative cancellation; cancelled intents cannot write state. Updates are attributed to their intent through a zone (`JIntent.current`), so the guarantee does not depend on callers passing `origin`. | Extends D6 without changing the default. Running code is never interrupted. |
 | D20 | Effect buffering is opt-in (`effectBufferSize`, default 0). | Covers effects emitted before the UI attaches without changing the D5 default semantics. |
-| D21 | `state_notifier ^1.0.0` stays the base of `JController` and `equatable` stays `^2.0.5`. | See below. |
+| D21 | `state_notifier ^1.0.0` stays the base of `JController` and `equatable` stays `^2.0.5`. | See below. The `equatable` part is superseded by [ADR-003](ADR-003-equatable-2-and-3.md). |
 
 ## Evidence for D21 (consulted 2026-10-16)
 
