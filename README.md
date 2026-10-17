@@ -13,6 +13,13 @@ handlers present dialogs, navigation and feedback outside persistent state.
 flutter pub add jintent
 ```
 
+Or declare it yourself. Version 3.0.0 requires Flutter 3.29.2 or newer:
+
+```yaml
+dependencies:
+  jintent: ^3.0.0
+```
+
 Import the public entry point:
 
 ```dart
@@ -36,6 +43,24 @@ ordering and migration from the legacy experimental import.
 
 Upgrading from 2.x changes state equality, effect failures and disposal
 behavior. Review the [migration guide](doc/migration.md) first.
+
+## What's new in 3.0.0
+
+- **Entry points:** `jintent.dart` holds only the core; devtools, undo/redo,
+  widgets, navigation, utilities and test helpers moved to their own imports.
+- **Predictable state:** updates equal to the current state are skipped, so
+  listeners and observers only see real changes.
+- **Safer effects:** an awaited effect without a listener or handler fails with
+  `StateError`, and disposal fails pending results. Effect buffering is opt-in.
+- **Concurrency:** droppable and restartable dispatchers, with cooperative
+  cancellation through `JIntent.cancel`.
+- **Observability:** composable `JObserverDelegate`s that also report failed,
+  cancelled and dropped intents, plus richer metrics and overlay.
+- **Also new:** stable undo/redo with observable history, `JControllerBuilder`
+  and `JControllerSelector`, and test recorders in `package:jintent/testing.dart`.
+
+Several of these change behavior compared with 2.x. See the full
+[changelog](CHANGELOG.md) and the [migration guide](doc/migration.md).
 
 ## Minimal example
 
