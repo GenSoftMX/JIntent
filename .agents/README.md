@@ -26,8 +26,9 @@ must continue in another session. This setup establishes no maturity level on it
 own; judge it by scope adherence, validations and repair cycles in real tasks.
 
 ## On-demand extensions
-Add `skills/` when repeated procedures are proven, in the skill format of the
-chosen environment. Add `hooks/` only with a defined event, conditions, action and
+`skills/` holds repeated procedures in the `SKILL.md` format; `update-site`
+keeps the interactive guide in sync (`.claude/skills/` links to it for Claude
+Code, so there is a single copy). Add further skills only for proven procedures. Add `hooks/` only with a defined event, conditions, action and
 adapter; Markdown does not execute hooks. No automatic hooks or telemetry are
 configured. The Context7 adapter lives in `.codex/config.toml` and is described
 in `rules/documentation.md`. Avoid duplicating rules per provider.

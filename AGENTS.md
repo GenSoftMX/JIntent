@@ -28,7 +28,9 @@ entry point; load only the resources the task needs.
 ## Canonical sources
 - [Architecture](.agents/rules/architecture.md), [style](.agents/rules/code-style.md),
   [testing](.agents/rules/testing.md), [changelog](.agents/rules/changelog.md),
-  [Git and security](.agents/rules/git.md).
+  [Git and security](.agents/rules/git.md),
+  [interactive guide](.agents/rules/site.md): documentation and demo changes
+  must update `site/`; see the [update-site skill](.agents/skills/update-site/SKILL.md).
 - [System map](.agents/knowledge/system-overview.md).
 - [External documentation with Context7](.agents/rules/documentation.md): query
   APIs and versions on demand; project adapter in `.codex/config.toml`.
