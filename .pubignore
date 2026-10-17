@@ -19,6 +19,7 @@ migrate_working_dir/
 .dart_tool/
 build/
 coverage/
+*.env
 
 # Repository tooling and sources that are not part of the package.
 /AGENTS.md
