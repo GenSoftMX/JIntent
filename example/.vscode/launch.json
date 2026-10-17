@@ -1,19 +1,33 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Develop",
-            "program": "lib/main.dart",
+            "name": "Gallery (debug)",
             "request": "launch",
             "type": "dart",
-            "args": [
-                "--dart-define=environment=prod"
-            ],
-            "flutterMode": "debug",
-            "toolArgs": [],
+            "program": "lib/main.dart",
+            "flutterMode": "debug"
         },
+        {
+            "name": "Gallery (profile)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Gallery (release)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Integration test (open file)",
+            "request": "launch",
+            "type": "dart",
+            "program": "${file}",
+            "flutterMode": "debug"
+        }
     ]
 }

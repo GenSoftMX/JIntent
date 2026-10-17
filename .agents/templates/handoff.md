@@ -1,13 +1,13 @@
 # Handoff
 
-- Objetivo y alcance autorizado:
-- Completado:
-- Archivos y decisiones relevantes:
-- Contexto utilizado y vigencia:
-- Validaciones (comando, resultado; indicar no ejecutadas):
-- Fallos y reparaciones intentadas:
-- Pendientes y riesgos:
-- Autorizaciones o decisiones pendientes:
-- Siguiente paso concreto:
+- Goal and authorized scope:
+- Completed:
+- Relevant files and decisions:
+- Context used and currency:
+- Validations (command, result; mark not run):
+- Failures and attempted repairs:
+- Pending items and risks:
+- Pending authorizations or decisions:
+- Concrete next step:
 
-No incluir secretos ni historial completo. Registrar solo evidencia disponible.
+Do not include secrets or full history. Record only available evidence.

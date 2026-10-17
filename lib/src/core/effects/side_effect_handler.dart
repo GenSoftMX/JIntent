@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jintent/jintent.dart';
-import 'package:jintent/src/core/effects/jeffect_config.dart';
 
 /// Type alias for internal handler function signature.
 /// This is used to map effects to their handlers.
@@ -15,8 +14,12 @@ typedef _InternalHandler =
 
 /// Base class for handling side effects in a [JController].
 /// Enhanced to support:
-/// - Hierarchical handler resolution (superclass fallback).
-/// - Unhandled strategies (warn, auto-complete, throw).
+/// - Exact-type handler registration.
+/// - Unhandled strategies (warn, complete with error, throw).
+///
+/// Register each concrete effect type explicitly. Inheritance-based fallback
+/// is not supported. A handler failure completes any pending result with the
+/// original error and fails [handle] with that same error and stack trace.
 abstract class JSideEffectHandler<T extends JState> {
   late final JController<T> controller;
 
@@ -35,9 +38,14 @@ abstract class JSideEffectHandler<T extends JState> {
     JController<T> controller,
     BuildContext context,
   ) async {
-    final handler = _resolveHandler(effect);
+    final handler = _handlers[effect.runtimeType];
     if (handler != null) {
-      await handler(effect, controller, context);
+      try {
+        await handler(effect, controller, context);
+      } catch (error, stackTrace) {
+        _completeFailure(effect, error, stackTrace);
+        rethrow;
+      }
 
       if (kDebugMode &&
           !effect.isCompleted &&
@@ -52,68 +60,36 @@ abstract class JSideEffectHandler<T extends JState> {
     }
   }
 
-  _InternalHandler? _resolveHandler(JEffect effect) {
-    // Exact type first
-    final exact = _handlers[effect.runtimeType];
-    if (exact != null) return exact;
-
-    // Walk superclass chain
-    Type? current = effect.runtimeType;
-    final visited = <Type>{};
-
-    while (current != null) {
-      if (visited.contains(current)) break;
-      visited.add(current);
-
-      final superType = _findSuperclass(current);
-      if (superType != null) {
-        final candidate = _handlers[superType];
-        if (candidate != null) return candidate;
-        current = superType;
-      } else {
-        break;
-      }
-    }
-    return null;
-  }
-
-  // NOTE: Reflection is limited in Dart (no mirrors in Flutter). This is a placeholder
-  // for a manual mapping mechanism if you want to register explicit hierarchies.
-  // Alternative: Require additional manual registration: registerForHierarchy<Base, Derived>.
-  Type? _findSuperclass(Type t) {
-    // No generic runtime support: can be implemented with a manual map if desired.
-    return null;
+  void _completeFailure(JEffect effect, Object error, StackTrace stackTrace) {
+    // The handler future (or warning for an absent handler) surfaces the failure.
+    // Observing result prevents a second unhandled error for callers that only
+    // await handle(), without changing the result seen by other awaiters.
+    effect.result.ignore();
+    if (!effect.isCompleted) effect.completeError(error, stackTrace);
   }
 
   void _handleUnhandled(JEffect effect) {
     final strategy = JEffectsConfig().unhandledStrategy;
     final isAwaitable = effect is! JFireAndForgetEffect;
+    if (!isAwaitable) return;
+    final error = StateError(
+      'No handler registered for ${effect.runtimeType} (id=${effect.id}). '
+      'Register a handler for this concrete effect type.',
+    );
 
-    if (strategy == UnhandledEffectStrategy.throwError && isAwaitable) {
-      effect.completeError(
-        StateError('No handler registered for ${effect.runtimeType}'),
-      );
-      throw StateError(
-        '[JEffect] No handler registered for ${effect.runtimeType}',
-      );
+    if (strategy == UnhandledEffectStrategy.throwError) {
+      _completeFailure(effect, error, StackTrace.current);
+      throw error;
     }
 
-    if (strategy == UnhandledEffectStrategy.warnAndAutoComplete &&
-        isAwaitable) {
-      if (kDebugMode) {
-        debugPrint(
-          '⚠️ [JEffect] Unhandled awaitable effect ${effect.runtimeType} → auto-completing with null.',
-        );
-      }
-      // ignore: null_check_on_nullable_type_parameter
-      effect.complete(null as dynamic);
+    if (strategy != UnhandledEffectStrategy.warnOnly) {
+      _completeFailure(effect, error, StackTrace.current);
+      if (kDebugMode) debugPrint('⚠️ [JEffect] $error');
       return;
     }
 
-    if (strategy == UnhandledEffectStrategy.warnOnly) {
-      if (kDebugMode) {
-        debugPrint('⚠️ [JEffect] Unhandled effect ${effect.runtimeType}');
-      }
+    if (kDebugMode) {
+      debugPrint('⚠️ [JEffect] Unhandled effect ${effect.runtimeType}');
     }
   }
 }

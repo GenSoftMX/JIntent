@@ -1,16 +1,20 @@
-import 'package:counter/di/di.dart';
 import 'package:counter/navigation/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
+import 'app_setup.dart';
+
+/// Longer than the counter view's 200 ms throttle interval.
+const _afterThrottle = Duration(milliseconds: 400);
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Error Handling Integration Tests', () {
     setUp(() async {
-      await Di().init();
+      await prepareCounterApp();
     });
 
     testWidgets('displays error when exceeding maximum boundary', (
@@ -19,7 +23,7 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final incrementButton = find.byIcon(Icons.add);
+      final incrementButton = find.byTooltip('Increment');
 
       // Increment to maximum (10)
       for (int i = 0; i < 10; i++) {
@@ -29,15 +33,16 @@ void main() {
 
       // Try to exceed maximum - should trigger error handling
       await tester.tap(incrementButton);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       // Verify counter stays at maximum
       expect(find.text('10'), findsOneWidget);
 
-      // Note: In a real app, you might also check for:
-      // - Error dialog: expect(find.text('Error'), findsOneWidget);
-      // - Snackbar: expect(find.byType(SnackBar), findsOneWidget);
-      // - Error message text
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(
+        find.textContaining('Value cannot be greater than 10'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays error when exceeding minimum boundary', (
@@ -46,7 +51,7 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final decrementButton = find.byIcon(Icons.remove);
+      final decrementButton = find.byTooltip('Decrement');
 
       // Decrement to minimum (-10)
       for (int i = 0; i < 10; i++) {
@@ -56,34 +61,40 @@ void main() {
 
       // Try to go below minimum - should trigger error handling
       await tester.tap(decrementButton);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       // Verify counter stays at minimum
       expect(find.text('-10'), findsOneWidget);
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(
+        find.textContaining('Value cannot be less than -10'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('handles rapid button presses gracefully', (tester) async {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final incrementButton = find.byIcon(Icons.add);
+      final incrementButton = find.byTooltip('Increment');
 
-      // Rapid fire increments without waiting
+      // Rapid fire increments without waiting. The view's JThrottler runs the
+      // first tap at once and, when its interval ends, only the latest one.
       for (int i = 0; i < 5; i++) {
         await tester.tap(incrementButton);
       }
+      await tester.pump(_afterThrottle);
       await tester.pumpAndSettle();
 
-      // Should handle all increments correctly
-      expect(find.text('5'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
     });
 
     testWidgets('handles alternating rapid presses', (tester) async {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final incrementButton = find.byIcon(Icons.add);
-      final decrementButton = find.byIcon(Icons.remove);
+      final incrementButton = find.byTooltip('Increment');
+      final decrementButton = find.byTooltip('Decrement');
 
       // Alternate between increment and decrement rapidly
       await tester.tap(incrementButton);
@@ -92,18 +103,20 @@ void main() {
       await tester.tap(decrementButton);
       await tester.tap(incrementButton);
 
+      // The first tap (+1) runs at once and the latest one (+1) when the
+      // throttle interval ends; the ones in between are discarded.
+      await tester.pump(_afterThrottle);
       await tester.pumpAndSettle();
 
-      // Final result should be +1
-      expect(find.text('1'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
     });
 
     testWidgets('recovers from error state on valid operation', (tester) async {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final incrementButton = find.byIcon(Icons.add);
-      final decrementButton = find.byIcon(Icons.remove);
+      final incrementButton = find.byTooltip('Increment');
+      final decrementButton = find.byTooltip('Decrement');
 
       // Go to maximum
       for (int i = 0; i < 10; i++) {
@@ -129,8 +142,8 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final incrementButton = find.byIcon(Icons.add);
-      final decrementButton = find.byIcon(Icons.remove);
+      final incrementButton = find.byTooltip('Increment');
+      final decrementButton = find.byTooltip('Decrement');
 
       // Complex scenario with multiple error conditions
 
@@ -180,8 +193,8 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final incrementButton = find.byIcon(Icons.add);
-      final decrementButton = find.byIcon(Icons.remove);
+      final incrementButton = find.byTooltip('Increment');
+      final decrementButton = find.byTooltip('Decrement');
 
       // Trigger error by exceeding max
       for (int i = 0; i < 11; i++) {

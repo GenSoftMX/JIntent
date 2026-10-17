@@ -72,6 +72,6 @@ class ValidateCounterConfigUseCase extends JSyncUseCase<CounterConfig, bool> {
   @override
   Either<Exception, bool> run(CounterConfig input) {
     // If we reach here, all validations passed
-    return Right(true);
+    return const Right(true);
   }
 }

@@ -1,136 +1,141 @@
-# Counter App with MVI Architecture (Powered by JIntent)
+# JIntent gallery
 
-A simple Flutter counter app demonstrating the MVI (Model-View-Intent) architecture, now powered by [JIntent](https://github.com/GenSoftMX/JIntent) to streamline intent handling, state management, and side effects.
+A Flutter application that exercises the library through small, focused demos.
+It consumes JIntent through a local path dependency. After the splash screen,
+the gallery lists:
 
----
+| Demo | What it shows | Code |
+| --- | --- | --- |
+| Counter | The full architecture: use cases, mappers, repositories, Riverpod, a service locator, effect handlers and error handling | [presentation/counter](lib/src/presentation/counter/) |
+| Concurrency Lab | The same five tasks under the sequential, concurrent, droppable and restartable dispatchers, with cooperative cancellation and the timeline an observer reports | [demos/concurrency_lab](lib/src/demos/concurrency_lab/) |
+| Startup & Effects | `effectBufferSize` for effects emitted before the UI attaches, dialogs with results, timeouts, unhandled effects and `JValidationUtils` | [demos/startup_effects](lib/src/demos/startup_effects/) |
+| Observability Lab | `JMetrics`, correlation ids, a custom `JObserverDelegate`, several observers at once and `JDevToolsOverlay` | [demos/observability_lab](lib/src/demos/observability_lab/) |
+| Undo Notes | Stable `UndoRedoMixin`, `UndoableIntent` and observable history | [demos/undo_notes](lib/src/demos/undo_notes/) |
 
-## Overview
+The four lab demos consume controller state with `JControllerBuilder` from
+[`package:jintent/widgets.dart`](../lib/widgets.dart), without a provider package.
+The counter uses Riverpod. Both styles work because a `JController` is a
+`StateNotifier`. Tests live under [test/src/demos](test/src/demos/), using
+`package:jintent/testing.dart`.
 
-The MVI architecture separates an application into three components: Model, View, and Intent.
+Startup & Effects also demonstrates an
+[effect-owned dialog](lib/src/demos/shared/effect_dialog.dart): timeout or
+controller disposal removes only the dialog route belonging to that effect,
+without popping a newer route. This is application UI policy, not automatic
+navigation performed by the library.
 
-- **Model:** Represents the state of the application. In this app, the `CounterState` class holds the current count.
+Undo Notes uses [`package:jintent/undo_redo.dart`](../lib/undo_redo.dart). Its
+history buttons listen to metadata independently of document content; clearing
+history leaves the notes intact. See the [full guide](../doc/undo-redo.md).
 
-- **View:** The UI of the application. The `CounterScreen` widget displays the current count and provides buttons to increment and decrement the count.
+## File organization
 
-- **Intent:** Represents user actions that trigger state changes. The `CounterIntent` class defines different user actions, such as incrementing and decrementing the count.
+Each demo keeps its state, controller and page in separate files. Each intent
+has its own `*_intent.dart` file; effects and their UI handler are separate too.
+Controllers import the state and intents they use instead of re-exporting them.
+Views and tests import each type from its defining file.
 
-With **JIntent**, you also benefit from:
-- **Side effect management:** Clean handling of navigation, dialogs, and other one-off UI actions via the side effect stream.
-- **Decoupled architecture:** UI interacts with the controller through intents, and responds to state and side effects, promoting a maintainable and scalable codebase.
+Each feature groups these files by responsibility. For example, Undo Notes:
 
----
+```text
+undo_notes/
+  controller/notes_controller.dart
+  state/notes_state.dart
+  intents/add_note_intent.dart
+  intents/remove_last_note_intent.dart
+  presentation/notes_page.dart
+```
 
-## Project Structure
+Effects live under `effects/`, with their UI handlers under `presentation/`.
+Concurrency and Observability use `observers/` for lifecycle recording and
+metrics, `models/` for log entries and outcomes, and `configuration/` for lab
+scenarios and dispatcher choices. Directories are created only when needed.
+Counter and Splash also use the singular `controller/` and `state/` names.
 
-- `lib/src/presentation/counter/state/state.dart`: Defines the `CounterState` class, representing the state of the counter.
-- `lib/src/presentation/counter/intents/increment_intent.dart`: Defines the `IncrementIntent` class, representing user actions to increment.
-- `lib/src/presentation/counter/controller/controller.dart`: Implements the `Controller` class, extending `JController` to handle state changes and side effects based on user actions and intents.
-- `lib/main.dart`: The entry point of the application. It sets up the `ProviderScope` and creates the `CounterScreen` widget.
+## Run
 
----
+From `example/`:
 
-## Implementation Diagram
+```sh
+flutter pub get
+flutter run
+```
 
-![Counter MVI Diagram](assets/count-diagram.png)
+In an IDE, open the `example/` folder (not the repository root):
 
----
+- **Android Studio:** it detects `lib/main.dart` and creates the `main.dart` run
+  configuration on its own. Pick a device and press Run.
+- **VS Code:** with the Flutter extension, press F5 and choose one of the
+  configurations in [.vscode/launch.json](.vscode/launch.json): the gallery in
+  debug, profile or release mode, or the integration test open in the editor.
 
-## Dependencies
+Run `flutter analyze` and `flutter test` in this directory to validate the
+example separately from the library. Device-based integration tests live in
+[integration_test](integration_test/).
 
-- [flutter](https://flutter.dev/)
-- [riverpod](https://pub.dev/packages/riverpod)
-- [provider](https://pub.dev/packages/provider)
-- [JIntent](https://pub.dev/packages/jintent)
+## Read the implementation
 
----
+- [State](lib/src/presentation/counter/state/state.dart).
+- [Controller](lib/src/presentation/counter/controller/controller.dart) and
+  [intents](lib/src/presentation/counter/intents/).
+- [View](lib/src/presentation/counter/presentation/counter_view.dart) and
+  [effect handler](lib/src/presentation/counter/presentation/counter_effect_handler.dart).
+- [Use cases](lib/src/domain/use_cases/) and [validators](lib/src/domain/validators/).
+- [Data helpers](lib/src/data/): DTO, entity, one-way and bidirectional mapper, and
+  an in-memory repository with `Either` failures.
+- [Observability setup](lib/src/@core/observability/): `ObservabilitySetup`
+  initializes the logger, logging observer, optional metrics and an
+  `IntentOutcomeObserver` (a `JObserverDelegate` that logs failed, cancelled and
+  dropped intents) once; `main` calls it at startup. `ObservableIntentMixin` adds
+  contextual logging and timers. Initialize the setup before using its logger.
 
-## What's New with JIntent v2.0.0?
+These helpers are application examples, not JIntent exports or required
+infrastructure. Call use cases through `call` so their fail-fast validator chain
+runs; `run` bypasses it.
 
-- **Side Effects System:** Use a side effect stream to handle navigation, dialogs, snackbars, and more in a clear, centralized way.
-- **UI/Controller Decoupling:** The UI listens to state and side effects; logic is triggered via intents, not by direct controller calls.
-- **Dependency Injection Agnostic:** No internal dependency injection—use your favorite approach or manage dependencies manually.
+## Library features in the counter
 
-For more details, see the [full changelog](../CHANGELOG.md).
+- **Concurrency:** the counter controller keeps the default
+  `JSequentialIntentDispatcher`, so taps that arrive during a save are queued
+  and run in order. (The view's 200 ms `JThrottler` still filters bursts of
+  taps before they reach the controller.) See the
+  [concurrency guide](../doc/concurrency.md) and the
+  [sequential tests](test/src/presentation/counter_sequential_test.dart).
+- **Observers:** [`IntentOutcomeObserver`](lib/src/@core/observability/observability_setup.dart)
+  and its [test](test/src/observability/intent_outcome_observer_test.dart).
+- **Feedback effects:** `CounterEffectHandler` shows one snack bar at a time
+  (`ScaffoldMessenger` queues them otherwise) and the rejection snack bar has no
+  action, so its 3 s duration applies on every supported Flutter version. See the
+  [snack bar tests](test/src/presentation/counter_snackbar_test.dart).
+- **Sealed `Either`:** `GetCurrentCounterValueIntent` handles the result with an
+  exhaustive `switch`; the other intents use `fold`.
+- **Testing helpers:** the contract and sequential tests use `JStateRecorder`,
+  `JEffectRecorder` and `resetJIntentGlobals` from `package:jintent/testing.dart`;
+  see the [testing guide](../doc/testing.md).
 
----
+The gallery demos cover the rest of the library surface; see the table above.
 
-## Error Handling in This Example
+## Error handling
 
-This example demonstrates **comprehensive error handling patterns** with consistent UX:
+- [Intents](lib/src/presentation/counter/intents/) handle recoverable operation
+  failures and emit dedicated effects while the controller is mounted.
+- [CounterEffectHandler](lib/src/presentation/counter/presentation/counter_effect_handler.dart)
+  registers each concrete feedback type and owns snackbars and dialogs.
+- The [controller](lib/src/presentation/counter/controller/controller.dart)
+  returns dispatch futures.
+- The [view](lib/src/presentation/counter/presentation/counter_view.dart) catches
+  unexpected or lifecycle errors at its UI boundary, logs them and does not emit
+  another feedback effect.
+- [Contract tests](test/src/presentation/core_contracts_test.dart) exercise
+  these boundaries.
 
-### Error Types Demonstrated
-
-1. **Validation Errors** (Red Snackbar 🔴)
-   - Try incrementing when counter is at 10
-   - Try decrementing when counter is at -10
-   - Shows error message with dismiss action
-
-2. **Success Feedback** (Green Snackbar 🟢)
-   - Reach milestones (every 10th increment)
-   - Automatic positive feedback
-
-3. **Multiple Severity Levels**
-   - Error (red) - validation failures
-   - Success (green) - milestones
-   - Warning (orange) - potential issues
-   - Info (blue) - informational messages
-   - Dialog - critical errors requiring attention
-
-### Effect Categories
-
-All effects are categorized for analytics:
-- `error` - Error snackbars
-- `success` - Success feedback
-- `warning` - Warning messages
-- `info` - Informational messages
-- `error_dialog` - Critical error dialogs
-
-### Documentation
-
-For a complete guide to the error handling patterns used in this app, see:
-- **[Error Handling Example Guide](./ERROR_HANDLING_EXAMPLE.md)** - Comprehensive documentation
-- **[Error Handling Guide](../docs/ERROR_HANDLING_GUIDE.md)** - General patterns and best practices
-- **[Global Error Handler Guide](../docs/GLOBAL_ERROR_HANDLER.md)** - Production-ready error handling
-
----
-
-## How to Run
-
-1. Ensure that you have Flutter installed on your machine.
-
-2. Clone this repository:
-
-   ```bash
-   git clone https://github.com/GenSoftMX/JIntent
-   ```
-
-3. Navigate to the project directory:
-
-   ```bash
-   cd example/counter
-   ```
-
-4. Run the app:
-
-   ```bash
-   flutter run
-   ```
-
-5. Run tests:
-
-   ```bash
-   flutter test
-   ```
-
----
-
-## Contributing
-
-Contributions are welcome! Feel free to open issues or pull requests for any improvements or features you'd like to add.
-
----
+See the library [error handling](../doc/error-handling.md),
+[effects](../doc/effects.md) and [migration](../doc/migration.md) guides for the
+contracts used here. This application's layering and dependencies are consumer
+choices, not library requirements.
 
 ## License
+
 
 MIT License
 

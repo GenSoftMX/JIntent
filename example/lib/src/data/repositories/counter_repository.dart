@@ -105,7 +105,7 @@ class InMemoryCounterRepository implements CounterRepository {
       }
 
       _storage = null;
-      return Right(null);
+      return const Right(null);
     } catch (e) {
       return Left(Exception('Failed to delete counter: $e'));
     }

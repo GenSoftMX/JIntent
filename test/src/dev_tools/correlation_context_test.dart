@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:jintent/jintent.dart';
+import 'package:jintent/devtools.dart';
 
 void main() {
   group('CorrelationContext', () {

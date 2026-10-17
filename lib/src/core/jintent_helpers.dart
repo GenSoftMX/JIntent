@@ -11,14 +11,14 @@ import 'package:jintent/jintent.dart';
 /// Example usage:
 /// ```dart
 /// class IncrementIntent extends JIntent<CounterState>
-///     with JIntentMeta, JIntentHelpers<CounterState> {
+///     with JMetaData<CounterState>, JIntentHelpers<CounterState> {
 ///
 ///   @override
 ///   String get type => 'counter';
 ///
 ///   @override
-///   Future<void> invoke(JController<CounterState> controller) async {
-///     update(controller, (state) => state.copyWith(value: state.value + 1));
+///   Future<void> onInvoke() async {
+///     update((state) => state.copyWith(value: state.value + 1));
 ///   }
 /// }
 /// ```

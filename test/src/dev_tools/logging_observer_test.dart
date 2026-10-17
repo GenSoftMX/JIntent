@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jintent/jintent.dart';
+import 'package:jintent/devtools.dart';
 
 class FakeIntent extends JIntent<JState> {
   @override
@@ -21,12 +22,59 @@ class FakeEffect extends JEffect<void> {}
 
 void main() {
   group('enableLoggingObserver', () {
-    test('registers logging callbacks when in debug mode', () {
-      enableLoggingObserver();
+    test('registers an observer without taking the static callbacks', () {
+      var staticCalls = 0;
+      JObserver.onIntentDispatched = (_) => staticCalls++;
+      final prints = <String>[];
+      final previous = debugPrint;
+      debugPrint = (String? message, {int? wrapWidth}) {
+        if (message != null) prints.add(message);
+      };
+      addTearDown(() => debugPrint = previous);
 
-      expect(JObserver.onIntentDispatched, isNotNull);
-      expect(JObserver.onStateChanged, isNotNull);
-      expect(JObserver.onEffectEmitted, isNotNull);
+      final remove = enableLoggingObserver();
+      JObserver.notifyIntentDispatched(FakeIntent());
+
+      expect(staticCalls, 1);
+      expect(prints, ['[Observer] Intent dispatched: FakeIntent']);
+
+      remove();
+      prints.clear();
+      JObserver.notifyIntentDispatched(FakeIntent());
+      expect(prints, isEmpty);
+    });
+
+    test('logs cancelled and dropped intents', () {
+      final prints = <String>[];
+      final previous = debugPrint;
+      debugPrint = (String? message, {int? wrapWidth}) {
+        if (message != null) prints.add(message);
+      };
+      addTearDown(() => debugPrint = previous);
+
+      enableLoggingObserver();
+      JObserver.notifyIntentCancelled(FakeIntent());
+      JObserver.notifyIntentDropped(FakeIntent());
+
+      expect(prints, [
+        '[Observer] Intent cancelled: FakeIntent',
+        '[Observer] Intent dropped: FakeIntent',
+      ]);
+    });
+
+    test('is idempotent and logs failures', () {
+      final prints = <String>[];
+      final previous = debugPrint;
+      debugPrint = (String? message, {int? wrapWidth}) {
+        if (message != null) prints.add(message);
+      };
+      addTearDown(() => debugPrint = previous);
+
+      enableLoggingObserver();
+      enableLoggingObserver();
+      JObserver.notifyIntentFailed(FakeIntent(), 'boom', StackTrace.empty);
+
+      expect(prints, ['[Observer] Intent failed: FakeIntent: boom']);
     });
 
     test('logging callbacks print debug messages', () {
@@ -45,9 +93,9 @@ void main() {
         }
       };
 
-      JObserver.onIntentDispatched?.call(intent);
-      JObserver.onStateChanged?.call(prevState, nextState, intent);
-      JObserver.onEffectEmitted?.call(effect);
+      JObserver.notifyIntentDispatched(intent);
+      JObserver.notifyStateChanged(prevState, nextState, intent);
+      JObserver.notifyEffectEmitted(effect);
 
       expect(
         prints,
@@ -62,11 +110,6 @@ void main() {
       debugPrint = debugPrintSynchronously;
     });
 
-    tearDown(() {
-      // Limpia los callbacks para evitar efecto en otros tests
-      JObserver.onIntentDispatched = null;
-      JObserver.onStateChanged = null;
-      JObserver.onEffectEmitted = null;
-    });
+    tearDown(JObserver.reset);
   });
 }

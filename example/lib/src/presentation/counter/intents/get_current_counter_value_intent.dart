@@ -1,6 +1,6 @@
 import 'package:counter/src/domain/use_cases/get_current_value_use_case.dart';
-import 'package:counter/src/presentation/counter/presentation/counter_effect_handler.dart';
-import 'package:counter/src/presentation/counter/states/state.dart';
+import 'package:counter/src/presentation/counter/effects/show_reject_operation.dart';
+import 'package:counter/src/presentation/counter/state/state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jintent/jintent.dart';
 
@@ -17,20 +17,24 @@ class GetCurrentCounterValueIntent extends JIntent<CounterState>
     final getCurrentValueUseCaseResult = await _getCurrentValueUseCase.run(
       const JNoParams(),
     );
+    if (!controller.mounted) return;
 
-    getCurrentValueUseCaseResult.fold(
-      (failure) => handleFailure(failure),
-      (data) => handleSuccess(data),
-    );
+    // `Either` is sealed: the compiler checks that both cases are handled.
+    switch (getCurrentValueUseCaseResult) {
+      case Left(:final value):
+        handleFailure(value);
+      case Right(:final value):
+        handleSuccess(value);
+    }
   }
 
   @protected
   void handleFailure(Exception e) {
-    emitSideEffect(ShowRejectOperation(message: e.toString()));
+    emitSideEffect(ShowRejectOperation.fromException(e));
   }
 
   @protected
-  void handleSuccess(int value) async {
+  void handleSuccess(int value) {
     update((state) => state.copyWith(newStateCounter: value));
   }
 }

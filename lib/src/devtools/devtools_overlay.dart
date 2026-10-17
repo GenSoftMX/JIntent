@@ -29,12 +29,12 @@ class JDevToolsOverlay extends StatefulWidget {
   final int maxEvents;
 
   const JDevToolsOverlay({
-    Key? key,
+    super.key,
     required this.child,
     this.enabled = kDebugMode,
     this.maxEventAge = const Duration(seconds: 30),
     this.maxEvents = 50,
-  }) : super(key: key);
+  });
 
   @override
   State<JDevToolsOverlay> createState() => _JDevToolsOverlayState();
@@ -44,6 +44,7 @@ class _JDevToolsOverlayState extends State<JDevToolsOverlay> {
   final _events = Queue<DevToolsEvent>();
   bool _isVisible = false;
   bool _isExpanded = true;
+  void Function()? _removeObserver;
 
   @override
   void initState() {
@@ -54,38 +55,54 @@ class _JDevToolsOverlayState extends State<JDevToolsOverlay> {
   }
 
   void _attachObservers() {
-    JObserver.onIntentDispatched = (intent) {
-      _addEvent(
-        DevToolsEvent(
-          type: EventType.intent,
-          title: intent.runtimeType.toString(),
-          timestamp: DateTime.now(),
-          metadata: _extractMetadata(intent),
-        ),
-      );
-    };
-
-    JObserver.onStateChanged = (prev, next, origin) {
-      _addEvent(
-        DevToolsEvent(
-          type: EventType.state,
-          title: '${prev.runtimeType} → ${next.runtimeType}',
-          timestamp: DateTime.now(),
-          metadata: {'origin': origin?.runtimeType.toString() ?? 'unknown'},
-        ),
-      );
-    };
-
-    JObserver.onEffectEmitted = (effect) {
-      _addEvent(
-        DevToolsEvent(
-          type: EventType.effect,
-          title: effect.runtimeType.toString(),
-          timestamp: DateTime.now(),
-          metadata: {'id': effect.id, 'category': effect.resolvedCategory},
-        ),
-      );
-    };
+    _removeObserver = JObserver.addObserver(
+      _OverlayObserver(
+        onIntent: (intent) {
+          _addEvent(
+            DevToolsEvent(
+              type: EventType.intent,
+              title: intent.runtimeType.toString(),
+              timestamp: DateTime.now(),
+              metadata: _extractMetadata(intent),
+            ),
+          );
+        },
+        onOutcome: (intent, outcome, error) {
+          _addEvent(
+            DevToolsEvent(
+              type: EventType.intent,
+              title: '${intent.runtimeType} ($outcome)',
+              timestamp: DateTime.now(),
+              metadata: {
+                ..._extractMetadata(intent),
+                'outcome': outcome,
+                if (error != null) 'error': error.toString(),
+              },
+            ),
+          );
+        },
+        onState: (prev, next, origin) {
+          _addEvent(
+            DevToolsEvent(
+              type: EventType.state,
+              title: '${prev.runtimeType} → ${next.runtimeType}',
+              timestamp: DateTime.now(),
+              metadata: {'origin': origin?.runtimeType.toString() ?? 'unknown'},
+            ),
+          );
+        },
+        onEffect: (effect) {
+          _addEvent(
+            DevToolsEvent(
+              type: EventType.effect,
+              title: effect.runtimeType.toString(),
+              timestamp: DateTime.now(),
+              metadata: {'id': effect.id, 'category': effect.resolvedCategory},
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Map<String, dynamic> _extractMetadata(dynamic intent) {
@@ -404,13 +421,49 @@ class _JDevToolsOverlayState extends State<JDevToolsOverlay> {
 
   @override
   void dispose() {
-    if (widget.enabled) {
-      JObserver.onIntentDispatched = null;
-      JObserver.onStateChanged = null;
-      JObserver.onEffectEmitted = null;
-    }
+    // Only this overlay's registration is removed; other observers and the
+    // static JObserver callbacks are left untouched.
+    _removeObserver?.call();
     super.dispose();
   }
+}
+
+class _OverlayObserver extends JObserverDelegate {
+  _OverlayObserver({
+    required this.onIntent,
+    required this.onOutcome,
+    required this.onState,
+    required this.onEffect,
+  });
+
+  final void Function(JIntent intent) onIntent;
+
+  /// Called for intents that did not complete normally: [outcome] is
+  /// `failed`, `cancelled` or `dropped`, and [error] is set for failures.
+  final void Function(JIntent intent, String outcome, Object? error) onOutcome;
+  final void Function(JState prev, JState next, JIntent? origin) onState;
+  final void Function(JEffect effect) onEffect;
+
+  @override
+  void onIntentDispatched(JIntent intent) => onIntent(intent);
+
+  @override
+  void onIntentFailed(JIntent intent, Object error, StackTrace stackTrace) =>
+      onOutcome(intent, 'failed', error);
+
+  @override
+  void onIntentCancelled(JIntent intent) =>
+      onOutcome(intent, 'cancelled', null);
+
+  @override
+  void onIntentDropped(JIntent intent) => onOutcome(intent, 'dropped', null);
+
+  @override
+  void onStateChanged(JState prev, JState next, JIntent? origin) =>
+      onState(prev, next, origin);
+
+  @override
+  void onEffectEmitted(JEffect effect) => onEffect(effect);
 }
 
 enum EventType { intent, state, effect }

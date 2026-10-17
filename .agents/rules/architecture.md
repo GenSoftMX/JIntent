@@ -1,16 +1,16 @@
-# Arquitectura
+# Architecture
 
-Aplica a cambios de biblioteca y contratos públicos.
+Applies to library changes and public contracts.
 
-- Revisar `lib/jintent.dart` y los barrels afectados antes de cambiar una API;
-  identificar consumidores y pruebas. No eliminar ni cambiar firmas o semántica
-  pública sin autorización para el impacto de compatibilidad.
-- Mantener la separación intent / controller / state / effect. No incorporar
-  infraestructura del ejemplo ni servicios específicos de una app al núcleo.
-- Conservar estados inmutables y `props` coherentes con los datos de estado.
-- Cambios de orden de intents, concurrencia, disposal o resultados de efectos
-  deben definir antes el comportamiento esperado y los casos de error.
-- Revisar el estado de cada ADR. No tratar propuestas como decisiones aceptadas
-  ni corregir silenciosamente discrepancias entre documentación y ejecución.
-- `example/` es consumidor: modificarlo cuando el alcance o un cambio de contrato
-  lo requiera; no convertir su arquitectura en requisito para toda la biblioteca.
+- Review `lib/jintent.dart` and the affected barrels before changing an API;
+  identify consumers and tests. Do not remove or change public signatures or
+  semantics without authorization for the compatibility impact.
+- Keep intent / controller / state / effect separated. Do not bring example
+  infrastructure or app-specific services into the core.
+- Keep states immutable and `props` consistent with the state data.
+- Changes to intent ordering, concurrency, disposal or effect results must define
+  the expected behavior and error cases first.
+- Check the status of each ADR. Do not treat proposals as accepted decisions or
+  silently fix discrepancies between documentation and execution.
+- `example/` is a consumer: change it when the scope or a contract change
+  requires; do not make its architecture a requirement for the whole library.

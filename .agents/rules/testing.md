@@ -1,22 +1,22 @@
-# Verificación
+# Verification
 
-- Documentación: revisar contenido, rutas y `git diff --check`; no requiere
-  ejecutar Flutter si no cambia código ni configuración.
-- Código: ejecutar `dart format --output=none --set-exit-if-changed` sobre los
-  archivos afectados, `flutter analyze` y pruebas relevantes con `flutter test`.
-- Bugs de lógica: agregar regresión que reproduzca el fallo y compruebe el
-  resultado esperado. Para async, cubrir errores y ciclo de vida relevantes;
-  preferir sincronización determinista frente a esperas arbitrarias.
-- Antes de entregar cambios de biblioteca, ejecutar `flutter test --coverage`.
-  CI actualmente verifica formato del repositorio, análisis, tests y umbral
-  global del 80%; comprobar `.github/workflows/ci.yml` si cambia.
-- El análisis raíz excluye `example/**`. Un resultado raíz no prueba que el
-  ejemplo compile o que una plataforma nativa funcione. Validar aparte si aplica.
-- No alterar pruebas ni reducir gates para esconder fallos. Distinguir fallos
-  previos de los introducidos; no repararlos fuera de alcance.
-- Si falta SDK, dependencia o servicio, reportar el bloqueo y los comandos no
-  ejecutados; no instalar ni actualizar herramientas globales sin autorización.
-- Ante fallos: diagnosticar, reparar dentro del alcance y volver a verificar.
-  Tras tres intentos sin resolver la misma causa, reportar evidencia y pedir
-  la decisión o información necesaria; no repetir indefinidamente.
-- No afirmar cobertura, compatibilidad ni éxito de CI sin evidencia de ejecución.
+- Documentation: review content, paths and `git diff --check`; Flutter need not
+  run if no code or configuration changes.
+- Code: run `dart format --output=none --set-exit-if-changed` on affected files,
+  `flutter analyze` and relevant `flutter test` suites.
+- Logic bugs: add a regression that reproduces the failure and checks the
+  expected result. For async code, cover errors and relevant lifecycle; prefer
+  deterministic synchronization over arbitrary waits.
+- Before delivering library changes, run `flutter test --coverage`. CI currently
+  checks repository formatting, analysis, tests and the global 80% threshold;
+  check `.github/workflows/ci.yml` if it changes.
+- Root analysis excludes `example/**`. A root result does not prove the example
+  compiles or that a native platform works. Validate separately when relevant.
+- Do not alter tests or lower gates to hide failures. Distinguish pre-existing
+  failures from introduced ones; do not fix them out of scope.
+- If an SDK, dependency or service is missing, report the blocker and the
+  commands not run; do not install or update global tools without authorization.
+- On failures: diagnose, repair within scope and verify again. After three
+  attempts on the same cause, report the evidence and ask for the needed
+  decision or information; do not repeat indefinitely.
+- Do not claim coverage, compatibility or CI success without execution evidence.

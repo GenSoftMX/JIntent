@@ -1,7 +1,7 @@
 import 'package:counter/di/di.dart';
 import 'package:counter/navigation/router.dart';
 import 'package:flutter/material.dart';
-import 'package:jintent/jintent.dart';
+import 'package:jintent/navigation.dart';
 
 class NavigatorImpl implements JNavigator {
   @override

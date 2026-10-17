@@ -1,23 +1,26 @@
-# Flujo de tarea
+# Task workflow
 
-1. Revisar solicitud y estado Git. Distinguir análisis de implementación.
-2. Definir objetivo, límites y criterio de éxito. Para documentación menor basta
-   un alcance breve; para cambios funcionales usar los campos de la plantilla
-   de alcance, en la conversación o un archivo si aporta valor.
-3. Para arquitectura, seguridad, infraestructura, dependencias críticas o refactor
-   transversal: presentar alcance, plan e impacto y comprobar autorización antes
-   de implementar. Resolver decisiones faltantes sin repetir aprobaciones válidas.
-4. Descubrir fuentes cercanas: instrucciones aplicables, código, tests y contratos.
-   Evaluar relevancia, autoridad y vigencia; leer reglas del dominio afectado.
-   Cargar Knowledge o ADR únicamente para una pregunta concreta.
-5. Ejecutar el cambio mínimo autorizado. Si se necesita ampliar alcance, informar
-   la causa y obtener autorización antes de realizar esa ampliación.
-6. Aplicar las reglas de testing. Si falla, diagnosticar antes de reparar y acotar
-   los intentos. Distinguir verificación estática, ejecución y evidencia nativa.
-7. Revisar diff final y cerrar con resultado, contexto clave usado, archivos,
-   validaciones ejecutadas, bloqueos y riesgos pendientes. No inventar métricas.
-8. Si queda trabajo para otra sesión, usar la plantilla de handoff con el mínimo
-   contexto necesario y un siguiente paso concreto.
+1. Review the request and Git status. Distinguish analysis from implementation.
+2. Define goal, limits and success criteria. For minor documentation a brief
+   scope is enough; for functional changes use the scope template fields, in the
+   conversation or a file if it adds value.
+3. For architecture, security, infrastructure, critical dependencies or
+   cross-cutting refactors: present scope, plan and impact and confirm
+   authorization before implementing. Resolve missing decisions without
+   repeating valid approvals.
+4. Discover nearby sources: applicable instructions, code, tests and contracts.
+   Evaluate relevance, authority and currency; read the rules of the affected
+   domain. Load Knowledge or ADRs only for a concrete question. For doubts about
+   external APIs or versions, apply `../rules/documentation.md` and query
+   Context7 when available.
+5. Make the minimal authorized change. If scope must widen, report the cause and
+   get authorization before doing it.
+6. Apply the testing rules. On failure, diagnose before repairing and bound the
+   attempts. Distinguish static verification, execution and native evidence.
+7. Review the final diff and close with the result, key context used, files,
+   validations run, blockers and pending risks. Do not invent metrics.
+8. If work remains for another session, use the handoff template with the
+   minimum necessary context and one concrete next step.
 
-Dependencias: `../rules/architecture.md`, `../rules/code-style.md`,
-`../rules/testing.md`, `../rules/git.md`, según alcance.
+Dependencies, as scope requires: `../rules/architecture.md`,
+`../rules/code-style.md`, `../rules/testing.md`, `../rules/git.md`.

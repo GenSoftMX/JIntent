@@ -1,16 +1,17 @@
-import 'package:counter/di/di.dart';
 import 'package:counter/navigation/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
+import 'app_setup.dart';
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Counter Flow Integration Tests', () {
     setUp(() async {
-      await Di().init();
+      await prepareCounterApp();
     });
 
     testWidgets('complete increment flow', (tester) async {
@@ -22,7 +23,7 @@ void main() {
       expect(counterText, findsOneWidget);
 
       // Find and tap increment button
-      final incrementButton = find.byIcon(Icons.add);
+      final incrementButton = find.byTooltip('Increment');
       expect(incrementButton, findsOneWidget);
 
       await tester.tap(incrementButton);
@@ -40,7 +41,7 @@ void main() {
       expect(find.text('0'), findsOneWidget);
 
       // Decrement
-      final decrementButton = find.byIcon(Icons.remove);
+      final decrementButton = find.byTooltip('Decrement');
       await tester.tap(decrementButton);
       await tester.pumpAndSettle();
 
@@ -52,7 +53,7 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final incrementButton = find.byIcon(Icons.add);
+      final incrementButton = find.byTooltip('Increment');
 
       // Increment 3 times
       for (int i = 0; i < 3; i++) {
@@ -67,8 +68,8 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final incrementButton = find.byIcon(Icons.add);
-      final decrementButton = find.byIcon(Icons.remove);
+      final incrementButton = find.byTooltip('Increment');
+      final decrementButton = find.byTooltip('Decrement');
 
       // Increment 5 times
       for (int i = 0; i < 5; i++) {
@@ -89,7 +90,7 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final incrementButton = find.byIcon(Icons.add);
+      final incrementButton = find.byTooltip('Increment');
 
       // Increment to maximum (10)
       for (int i = 0; i < 10; i++) {
@@ -111,7 +112,7 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final decrementButton = find.byIcon(Icons.remove);
+      final decrementButton = find.byTooltip('Decrement');
 
       // Decrement to minimum (-10)
       for (int i = 0; i < 10; i++) {
@@ -134,8 +135,8 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: TestApp()));
       await tester.pumpAndSettle();
 
-      final incrementButton = find.byIcon(Icons.add);
-      final decrementButton = find.byIcon(Icons.remove);
+      final incrementButton = find.byTooltip('Increment');
+      final decrementButton = find.byTooltip('Decrement');
 
       // Complex sequence
       await tester.tap(incrementButton);
