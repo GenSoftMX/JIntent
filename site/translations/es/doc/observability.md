@@ -72,6 +72,14 @@ finalización de los effects. Conectarlo dos veces no tiene efecto adicional y
 `getSummary` para inspeccionarlas. `JMetrics.maxMetrics` (1000 por defecto) acota
 las mediciones retenidas descartando las más antiguas.
 
+Los nombres de intents, effects y estados en los logs, las etiquetas de métricas
+(`type`, `stateType`, `originIntent`), los títulos del overlay y los mensajes de
+error provienen de `runtimeType.toString()`. Las compilaciones que minifican u
+ofuscan nombres (Flutter web `--release`, o `--obfuscate` en móvil) reportan en su
+lugar nombres cortos generados, como `minified:dY`. Los contadores y el
+comportamiento no cambian; solo las etiquetas. Las compilaciones web con
+`--profile` conservan los nombres, por eso la guía interactiva compila así su demo.
+
 ## Overlay de depuración
 
 `JDevToolsOverlay` muestra dentro de la aplicación las notificaciones recientes de
