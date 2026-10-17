@@ -1,4 +1,4 @@
-## [3.0.0] - Unreleased
+## [3.0.0] - 2026-10-16
 
 Upgrading from 2.2.0: read the [migration guide](doc/migration.md). Requires
 Flutter 3.29.2 or newer.
