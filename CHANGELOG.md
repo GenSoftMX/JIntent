@@ -1,5 +1,9 @@
 ## [3.0.1] - 2026-10-16
 
+### Changed
+- Accepts `equatable` 2.x and 3.x (`>=2.0.5 <4.0.0`). State equality is
+  unchanged. See [ADR-003](doc/adr/ADR-003-equatable-2-and-3.md).
+
 ### Documentation
 - The README states the 3.0.0 requirements, summarizes what is new and links the
   interactive guide; the guides no longer describe 3.0.0 as unreleased.
